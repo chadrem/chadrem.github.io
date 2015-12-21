@@ -1,22 +1,15 @@
 ---
 layout: post
 title: 'Officer: The ruby lock server and client'
+comments: false
+share: false
 date: 2011-01-23
 type: post
-published: true
-status: publish
-categories: []
 tags:
 - eventmachine
 - lockserver
 - officer
 - ruby
-meta:
-  _original_post_id: ''
-  _original_import_author: Chad Remesch
-excerpt: What is it?Officer is an easy to use distributed lock server and client written
-  in Ruby. Wikipedia calls it a Distributed Lock Manager (DLM). Why would I use it?You
-  use it to prevent race conditions in your distributed applications. It can be used...
 ---
 <p><strong>What is it?</strong><br /><a href="https://github.com/chadrem/officer">Officer</a> is an easy to use distributed lock server and client written in Ruby. &nbsp;Wikipedia calls it a <a href="http://en.wikipedia.org/wiki/Distributed_lock_manager">Distributed Lock Manager (DLM)</a>.</p>
 <p><strong>Why would I use it?</strong><br />You use it to prevent <a href="http://en.wikipedia.org/wiki/Race_condition">race conditions</a>&nbsp;in your distributed applications. &nbsp;It can be used with any Ruby app including Rails. &nbsp;Officer helps you coordinate access to shared resources in a predictable way since a lock can be held by only one client at a time. &nbsp;Other clients will queue in an orderly fashion and wait their turn.</p>
