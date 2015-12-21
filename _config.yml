@@ -1,6 +1,6 @@
 # Site wide configuration
 
-title:            Site Title
+title:            Chad Remesch
 locale:           en_US
 url:
 
@@ -26,10 +26,10 @@ kramdown:
 
 # Site owner
 owner:
-  name: Your Name
+  name: Chad Remesch
   avatar: bio-photo.jpg
-  bio: "Describe your self."
-  email:
+  bio: "Entrepreneur and developer"
+  email: chad@remesch.com
   disqus-shortname:
   twitter: #username
   facebook: #username
@@ -40,9 +40,9 @@ owner:
     ad-client:
     ad-slot:
   bing-verify:
-  github: #username
+  github: chadrem
   stackoverflow: #123456/username   from a "http://stackoverflow.com/users/123456/username" link
-  linkedin: #username
+  linkedin: chadremesch
   xing: #username
   instagram: #username
   lastfm: #username
