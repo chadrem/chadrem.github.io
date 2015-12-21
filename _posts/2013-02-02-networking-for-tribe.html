@@ -1,0 +1,36 @@
+---
+layout: post
+title: Networking for Tribe
+date: 2013-02-02 16:49:00.000000000 -08:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- eventmachine
+- jruby
+- networking
+- ruby
+- tribe
+meta:
+  _edit_last: '11558416'
+  _original_post_id: ''
+  _original_import_author: Chad Remesch
+author:
+  login: chadrem
+  email: chad@remesch.com
+  display_name: chadrem
+  first_name: ''
+  last_name: ''
+excerpt: 'Recently I put together two new Ruby gems called Tribe EM and Tribe EM AMF
+  Socket. Both gems build on top of my Tribe gem: Tribe EM bridges the gap between
+  Tribe and EventMachine. Currently it provides basic TCP server functionality for
+  Tribe acto...'
+---
+<p>Recently I put together two new Ruby gems called <a title="Tribe EM" href="https://github.com/chadrem/tribe_em">Tribe EM</a> and <a title="Tribe EM AMF Socket" href="https://github.com/chadrem/tribe_em_amfsocket">Tribe EM AMF Socket</a>.  Both gems build on top of my <a title="Tribe" href="https://github.com/chadrem/tribe">Tribe</a> gem.</p>
+<p>Tribe EM bridges the gap between Tribe and <a title="EventMachine" href="http://rubyeventmachine.com/">EventMachine</a>.  Currently it provides basic TCP server functionality for Tribe actors.  My intent is to use this as a base for implementing higher-level protocols such as HTTP.</p>
+<p>Tribe EM AMF Socket is a wrapper around my existing <a title="AMF Socket - Ruby" href="https://github.com/chadrem/amf_socket_ruby">AMF Socket - Ruby</a> gem.  Currently it only supports messages and not requests (RPC).  I believe this to be a reasonable limitation for now since AMF Socket messages fit in very well with Tribe's asynchronous messaging system.</p>
+<p>One key difference between the two gems is what I refer to as native vs wrapper implementations:</p>
+<p><span style="text-decoration:underline;">Native</span>: The Tribe::EM::Connection class is considered native since it pushes the higher level protocol implementation onto the actor threads.  This results in greater scalability since actors take advantage of multi-core systems (especially on JRuby).</p>
+<p><span style="text-decoration:underline;">Wrapper</span>: The Tribe::EM::AmfSocket::Connection class is considered a wrapper since it wraps the AMF Socket gem for use with Tribe.  This means that a lot of work (serialization, deserialization, framing, keep alives, etc) are all performed on the EventMachine thread.  The result is lower performance than a native implementation, but less coding since I can reuse the existing Ruby implementation of AMF Socket.</p>
+<p>Both gem are designed to be easily customized.  Feel free to contact me with your custom protocol implementations so that I can add them to the Tribe EM homepage.</p>

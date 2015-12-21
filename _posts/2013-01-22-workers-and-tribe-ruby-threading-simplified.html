@@ -1,0 +1,34 @@
+---
+layout: post
+title: Workers and Tribe - Ruby threading simplified
+date: 2013-01-22 01:57:00.000000000 -08:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- actors
+- jruby
+- ruby
+- threading
+meta:
+  _original_post_id: ''
+  _original_import_author: Chad Remesch
+  _oembed_ef55b78503874f8793a87f9494c5c91a: "{{unknown}}"
+author:
+  login: chadrem
+  email: chad@remesch.com
+  display_name: chadrem
+  first_name: ''
+  last_name: ''
+excerpt: Recently I've created two new Ruby gems known as Workers and Tribe. The Workers
+  gem turns low-level operating system threads into simple to use event-driven workers
+  and worker pools. This allows you to focus on message passing instead of complex
+  t...
+---
+<p>Recently I've created two new Ruby gems known as <a href="https://github.com/chadrem/workers" title="Workers">Workers</a> and <a href="https://github.com/chadrem/tribe" title="Tribe">Tribe</a>.</p>
+<p>The <a href="https://github.com/chadrem/workers" title="Workers">Workers</a> gem turns low-level operating system threads into simple to use event-driven workers and worker pools. &nbsp;This allows you to focus on message passing instead of complex thread management. &nbsp;As an added bonus, it includes a timer system that can tell your workers to execute work in the future.</p>
+<p>The <a href="https://github.com/chadrem/tribe" title="Tribe">Tribe</a> gem builds on top of Workers in order to implement the <a href="http://en.wikipedia.org/wiki/Actor_model" title="actor model">actor model</a>. It specifically focuses on event-driven actors such that each thread manages one or more actors. &nbsp;This way the system can support many more actors than is possible with implementations that force a 1:1 thread to actor relationship. &nbsp;A simple benchmark demonstrating one million actors using 20 threads can be found on the <a href="https://github.com/chadrem/tribe/wiki/Performance" title="performance">performance</a> wiki page.</p>
+<p>Both gems have been tested with MRI Ruby 1.9.3 and JRuby 1.7. &nbsp;Due to MRI's thread limitations, it is highly recommended that you use JRuby if you are concerned about multi-core CPU performance.</p>
+<div>Inspiration comes from <a href="http://www.erlang.org/" title="Erlang">Erlang</a>, <a href="http://www.scala-lang.org/" title="Scala">Scala</a>, <a href="http://akka.io/" title="Akka">Akka</a>, and <a href="http://celluloid.io/" title="Celluloid">Celluloid</a>.&nbsp;</div>
+<p>&nbsp;</p>

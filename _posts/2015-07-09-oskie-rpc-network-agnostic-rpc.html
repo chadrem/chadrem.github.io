@@ -1,0 +1,31 @@
+---
+layout: post
+title: Oskie RPC - Network agnostic RPC
+date: 2015-07-09 22:14:52.000000000 -07:00
+type: post
+published: true
+status: publish
+categories: []
+tags: []
+meta:
+  _rest_api_published: '1'
+  _rest_api_client_id: "-1"
+  _publicize_job_id: '12580493241'
+  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:3634454;s:57:"https://twitter.com/chadremesch/status/619328914708533249";}}
+  _publicize_done_3822061: '1'
+  _wpas_done_3634454: '1'
+  publicize_twitter_user: chadremesch
+author:
+  login: chadrem
+  email: chad@remesch.com
+  display_name: chadrem
+  first_name: ''
+  last_name: ''
+---
+<p><a href="https://github.com/chadrem/oskie_rpc">Oskie RPC</a> is a simple RPC library and protocol for Ruby.  Main features:</p>
+<p><strong>Network agnostic:</strong> You provide it with input and receive output using whatever transport mechanism you prefer.  Typically this will be a TCP/IP connection.</p>
+<p><strong>Simple protocol:</strong> Though it has been developed for Ruby, the network protocol is extremely simple and should work well with any language that supports JSON encoded strings.</p>
+<p><strong>Easily modifiable:</strong> It was designed from the ground up to be modified both in code and in terms of protocol.  Prefer Message Pack over JSON?  Want to add compression?  All of these and more are easy to accomplish.</p>
+<p><strong>Messages and Requests:</strong>  Both messages (fire-and-forget) and requests (receive return values) are supported.  This covers the most common forms of communication over a TCP/IP socket.</p>
+<p><strong>Bi-directional:</strong> Both ends of a network connection are on equal footing once a connection is established.  This gives you great flexibility in designing your application.</p>
+<p><strong>Thread safe:</strong> Ruby threading has improved greatly over the last few years and is especially useful with JRuby.</p>

@@ -1,0 +1,28 @@
+---
+layout: post
+title: Workers - New Features
+date: 2013-05-17 23:15:43.000000000 -07:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- concurrency
+- jruby
+- ruby
+- threading
+- workers
+meta:
+  _publicize_pending: '1'
+  _edit_last: '11558416'
+author:
+  login: chadrem
+  email: chad@remesch.com
+  display_name: chadrem
+  first_name: ''
+  last_name: ''
+---
+<p>Recently I added a number of features to my <a title="Workers" href="https://github.com/chadrem/workers">Workers</a> gem:</p>
+<p>The <strong>Task and TaskGroup classes</strong> make it even easier to parallelize expensive computations (and blocking IO operations) using background threads.  They build on top of worker pools and standardize on various features such as success/failure handling, delayed execution, and arguments.</p>
+<p><strong>Parallel Map</strong> is syntactic sugar built on top of tasks and task groups.  It works very similar to Ruby's standard Array#map method except each element is mapped in parallel.</p>
+<p><strong>Pools are now dynamically resizable</strong>.  The long term vision for this feature is to experiment with auto-resizing algorithms that adapt to an applications load.  In the short term it is mostly useful for quickly changing the size of the default pool (currently set to 20 workers) without having to create a new one.</p>

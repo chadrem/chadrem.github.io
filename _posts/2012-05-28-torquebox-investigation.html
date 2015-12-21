@@ -1,0 +1,58 @@
+---
+layout: post
+title: Torquebox Investigation
+date: 2012-05-28 16:06:00.000000000 -07:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- rails
+- ruby
+- torquebox
+meta:
+  _original_post_id: ''
+  _original_import_author: Chad Remesch
+  _edit_last: '11558416'
+  _oembed_c2cb9c31b2a80edcb89bc4004779276a: "{{unknown}}"
+  _oembed_c3f7a6d1df5a561bb43cfc1bc518399e: "{{unknown}}"
+author:
+  login: chadrem
+  email: chad@remesch.com
+  display_name: chadrem
+  first_name: ''
+  last_name: ''
+excerpt: 'My good friend Scott McCarty mentioned that I should checkout the Torquebox
+  project and so I spent my morning with it. Below is a summary of my experience.
+  Installation You have to choose one of two install paths: The large download that
+  contains ...'
+---
+<p>My good friend <a href="http://crunchtools.com/">Scott McCarty</a> mentioned that I should checkout the <a href="http://torquebox.org/">Torquebox</a> project and so I spent my morning with it.  Below is a summary of my experience.</p>
+<p><span style="font-size:medium;"><strong>Installation</strong></span></p>
+<p><strong> </strong>You have to choose one of two install paths:</p>
+<ul>
+<li>The large download that contains everything you need (JRuby, Torquebox, etc).</li>
+<li>Manual instalation of JRuby and then the torquebox-server gem.</li>
+</ul>
+<p>I went with the gem option since I already had Jruby installed and I have an existing Rails app that is Jruby compatible.  There is only one area I got hung up on.  JRuby supports both the old (1.8) and new (1.9) ruby syntax.  All of my new projects use 1.9, but the current version of JRuby (1.6.7) defaults to 1.8 syntax.  The fix was simple once I learned how deployment descriptors work in Torquebox.  I had to drop the below torquebox.rb in my Rail's root folder:</p>
+<pre>  TorqueBox.configure do
+    ruby do
+      version "1.9"
+    end
+  end</pre>
+<p><span style="font-size:medium;"><strong>Workflow</strong></span></p>
+<p>Workflow for developing a Torquebox enhanced Rails app is the same as a normal Rails one.  The only difference is I had to replace running "rails server" with "torquebox deploy" and "torquebox run".  I still need to run "rails console" in a separate terminal.  Overall the Torquebox documentation is high quality and made it more or less painless.</p>
+<p class="p1"><strong style="font-size:medium;">Rails Console</strong></p>
+<p class="p1">The Rails console is slower to startup with JRuby.  I've found a number of useful <a href="http://blog.headius.com/2010/03/jruby-startup-time-tips.html">recommendations</a>, but none of them completely fix the problem.  My best recommendation is to make sure you keep your code compatible with the "reload!" method and avoid restarts.</p>
+<p><strong style="font-size:medium;">Testing</strong></p>
+<p class="p1">Next on my list of things to do is to figure out if people have Spork and Guard working with JRuby.  Using this combo of gems I have a really nice continuous testing solution with C Ruby.  I would hate to give this up with Torquebox.</p>
+<p><strong style="font-size:medium;">Vim</strong></p>
+<p class="p1">One unexpected side effect is that various commands in Vim are slow due to switching to JRuby. Vim appears to stall for a short, but noticable time when some plugins fire up JRuby processes.  I use a highly customized Vim using the <a href="https://github.com/carlhuda/janus">Janus</a> distribution.</p>
+<p><strong style="font-size:medium;">New Rails Projects</strong></p>
+<p>I haven't tried it, but I noticed that Torquebox comes with a command for generating new apps.  My guess is this is the way to go since it probably generates a Rails app that is fully patched for JRuby and Torquebox.</p>
+<p class="p1"><strong style="font-size:medium;">Converting Existing Rails Projects</strong></p>
+<p class="p1">My project was originally built for C ruby 1.9, MySQL, and Rails 3.2.  This meant I had to do my normal hacking on Gemfile and database.yml to make it simultaneously compatible with both C Ruby and JRuby.  Fortunately for me, all of my gems were compatible with JRuby including a few that integrate with C code via FFI.</p>
+<p class="p1"><span style="font-size:medium;"><strong>Deployment</strong></span></p>
+<p class="p1">Unfortunately I didn't take this experiment to the deployment phase. The documendation and packages for Fedora/RHEL look fairly straightforward for those with Linux sysadmin skills. It will most likely help to read over the JBoss documentation too. You can also deploy to Red Hat's Openshift cloud.</p>
+<p class="p1"><strong style="font-size:medium;">The Real Benefits</strong></p>
+<p class="p1">The real benefit of Torquebox is how it exposes the JBoss feature set to a standard Rails app.  In some cases it remaps standard Rails APIs to JBoss (like with caching and sessions).  Other features (such as job scheduling and messaging) aren't built into Rails so I believe they wrote wrappers.  Effectively they are giving you a more complete platform for building complex apps instead of you having to assemble one yourself from open source components.  Of course you can also pay Red Hat for support which is a huge win for some companies.  The JBoss, Torquebox, and JRuby teams are sponsored by Red Hat so you know you'll be well taken care of.</p>

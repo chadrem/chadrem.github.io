@@ -1,0 +1,30 @@
+---
+layout: post
+title: Tribe - Futures and Timers
+date: 2013-05-25 15:37:58.000000000 -07:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- concurrency
+- ruby
+- threading
+- tribe
+- workers
+meta:
+  _edit_last: '11558416'
+  publicize_twitter_user: chadremesch
+  _wpas_done_3634454: '1'
+  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:35648897;b:1;}}
+  _wpas_skip_3634454: '1'
+author:
+  login: chadrem
+  email: chad@remesch.com
+  display_name: chadrem
+  first_name: ''
+  last_name: ''
+---
+<p>I've added a few missing features to <a title="Tribe" href="https://github.com/chadrem/tribe">Tribe</a>- Timers and Futures.</p>
+<p><strong>Timers</strong> provide a way to tell an actor to do something in the future.  Tribe supports both one-shot and periodic timers so I believe all the major usage patterns are covered.  Adding this feature was fairly easy since all of the low level details are hidden in my <a title="Workers" href="https://github.com/chadrem/workers">Workers</a> gem.</p>
+<p><strong>Futures</strong> make it easy for an actor to ask another actor to perform an operation and return the result.  Previously you would have to use custom events and a lot of boilerplate code to accomplish this.  Both synchronous (blocking) and asynchronous (non-blocking) futures are supported.  More information on both types can be found in the readme file.</p>

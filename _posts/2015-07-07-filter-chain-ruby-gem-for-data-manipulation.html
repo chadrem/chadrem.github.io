@@ -1,0 +1,33 @@
+---
+layout: post
+title: Filter Chain - Ruby gem for data manipulation
+date: 2015-07-07 12:47:24.000000000 -07:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- concurrency
+- data
+- jruby
+- ruby
+meta:
+  _rest_api_published: '1'
+  _rest_api_client_id: "-1"
+  _publicize_job_id: '12483556883'
+  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:3634454;s:57:"https://twitter.com/chadremesch/status/618461313413443584";}}
+  _publicize_done_3822061: '1'
+  _wpas_done_3634454: '1'
+  publicize_twitter_user: chadremesch
+author:
+  login: chadrem
+  email: chad@remesch.com
+  display_name: chadrem
+  first_name: ''
+  last_name: ''
+---
+<p><a href="https://github.com/chadrem/filter_chain">Filter Chain</a> is a Ruby gem for processing data through a chain of filters in an object oriented style.  It includes a number of filters for simple tasks like compression, serialization, and multiplexing.</p>
+<p>It is very common in Ruby to use blocks and functional style programming to manipulate data.  The below example squares each element in an array and then removes the odd values:</p>
+<p style="padding-left:30px;">[1,2,3,4,5].map { |i| i**2 }.reject { |i| i.odd? }</p>
+<p>Such one-liners are an amazing feature of Ruby and very useful on the console.  Unfortunately, they can really start to break down in more complex situations.  This is where Filter Chain can be really useful.</p>
+<p>Unlike in the above example, filters in Filter Chain are dedicated classes with a simple API.  This means each filter can easily have it's own state, private helper methods, independent tests, and be reusable.  This is especially true for filters that include buffering, multithreading, and asynchronous IO.</p>

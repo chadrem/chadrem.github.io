@@ -1,0 +1,36 @@
+---
+layout: post
+title: Should I use SQL or NoSQL?
+date: 2011-01-20 02:23:00.000000000 -08:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- databases
+- nosql
+- sql
+meta:
+  _original_post_id: ''
+  _original_import_author: Chad Remesch
+author:
+  login: chadrem
+  email: chad@remesch.com
+  display_name: chadrem
+  first_name: ''
+  last_name: ''
+excerpt: 'Determining if you should use SQL or one of the many NoSQL solutions can
+  be a difficult decision to make. Hopefully this guide will help you in your decision
+  making process... Do you need a lot of flexibility in your read queries?YES: SQL
+  is the b...'
+---
+<p>Determining if you should use SQL or one of the many NoSQL solutions can be a difficult decision to make. &nbsp;Hopefully this guide will help you in your decision making process...</p>
+<p><strong>Do you need a lot of flexibility in your read queries?</strong><br /><em>YES</em>: SQL is the best choice for query flexibility since it has a well understood language for both simple and complex queries.&nbsp;MongoDB is also a good choice since it has some of the features of the SQL query syntax and you can add indexes on both regular and embedded documents.<br /><em>NO</em>: base your decision on other question(s).</p>
+<p class="p2"><strong>Is it acceptable to take your application down in order to change the schema?</strong><br /><em>YES</em>: base your decision on other question(s). &nbsp;Note that if you are using MySQL and have a busy server, you will have to take your application down in order to change your schema.<br /><em>NO</em>: You really need to consider your NoSQL options or commercial SQL databases. &nbsp;MongoDB is great in the sense that it doesn't enforce a schema on your documents. &nbsp;Key/value databases also give a lot of flexibility in this area since they force the schema to be in the application and not the database. &nbsp;With MySQL, schema changes typically are blocking operations that will cause your application to hang. &nbsp;This can take from seconds to hours depending on many factors (database size, server performance, etc).</p>
+<p class="p1"><strong>Do you need transactions?<br /></strong><em>YES</em>: Stick with MySQL or some other SQL database. &nbsp;SQL is the king of transactions. &nbsp;Some NoSQL solutions support limited forms of them (MongoDB, Redis).<br /><em>NO</em>: base your decision on other question(s).</p>
+<p class="p2"><strong>Do your developers have experience modeling data for different kinds of databases (SQL, document, key/value, etc)?<br /></strong><em>YES</em>: base your decision on other question(s).<br /><em>NO</em>: Then they should start off by writing some experimental apps using different databases in order to learn their quirks. &nbsp;Every database has "gotchas" that you really want to learn about before you start writing your application. &nbsp;This is especially true of NoSQL solutions if you background is in SQL.</p>
+<p class="p2"><strong>Is your IT staff or hosting provider willing and able to support your database?<br /></strong><em>YES</em>: base your decision on other question(s).<br /><em>NO</em>: Development costs are only one part of the picture. &nbsp;Once launched, it's going to need to be supported in production and every database solution requires specific knowledge in the areas of deployment, backups, monitoring, and performance tuning. &nbsp;You may be able to go with a hosted solution, a contractor, or full time staff if you don't want to support it on your own.</p>
+<p class="p2"><strong>Is your application best served by using multiple types of databases at the same time?<br /></strong><em>YES</em>: It's becoming more common to combine different types of databases within a single application. &nbsp;For example, If your application does lots of increment operations (think ad server counting hits or clicks) then you could use the high performance counters in Redis or MongoDB along with using SQL to store everything else.<br /><em>NO</em>: base your decision on other question(s).</p>
+<p class="p2"><strong>Is scalability a concern?<br /></strong><em>YES</em>: You're going to need to determine the vertical and horizontal scalability limitations of the various databases. &nbsp;Some databases like MySQL will scale vertically without much effort (just get a faster server). &nbsp;Other solutions such as Cassandra and Riak focus on scaling horizontally (add more servers), but then limit you in other ways. &nbsp;Another area to think about is scaling reads vs writes. &nbsp;Many database products have different techniques for scaling each (for example, MySQL slaves only scale reads).<br /><em>NO</em>: base your decision on other question(s).</p>
+<p class="p2">Are you considering NoSQL for one of your projects? &nbsp;If so I'd like to hear from you.</p>
+<p>&nbsp;</p>

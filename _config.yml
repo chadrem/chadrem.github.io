@@ -1,0 +1,12 @@
+# Site settings
+title: Chad Remesch
+email: chad@remesch.com
+description: > # this means to ignore newlines until "baseurl:"
+baseurl: "" # the subpath of your site, e.g. /blog/
+url: "http://remesch.com" # the base hostname & protocol for your site
+github_username: chadrem
+
+# Build settings
+markdown: kramdown
+
+permalink: /:year/:month/:day/:title/
