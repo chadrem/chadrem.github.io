@@ -23,21 +23,23 @@ tags: []
     job is a better situation to have than a buildup of overlapping jobs.
 </p>
 <p>
-    <strong>Tasks:</strong> Think of tasks as methods you want to execute when a specific job runs (such as an hourly job).
+    <strong>Tasks:</strong>
+    Think of tasks as methods you want to execute when a specific job runs (such as an hourly job).
     Tasks execute one by one in a guaranteed order within a job.
     They also provide exception handling so that a failed task won't prevent the tasks after it from running.
     This gives you fine grained control over how and when code should execute.
     It also helps prevent resource starvation by encouraging developers to limit the number of concurrent Ruby processes.
 </p>
 <p>
-    <strong>Controlled concurrency</strong>
+    <strong>Controlled concurrency:</strong>
     In Cron Helper terms, tasks prevent concurrency and jobs permit it.
     For exmaple, you could create two separate hourly jobs each with ten tasks.
     Each job only makes guarantees about the tasks that it controls.
     Tasks in different jobs may end up running concurrently depending on how you schedule them.
 </p>
 <p>
-    <strong>Productivity:</strong> Traditionally, creating cron jobs was a sysadmin task on a server.
+    <strong>Productivity:</strong>
+    Traditionally, creating cron jobs was a sysadmin task on a server.
     One of the great advantanges of the <a href="https://github.com/javan/whenever">Whenever</a> gem is that it gave
     this capability to the app developer by making it a first class concept in Rails.
     Cron Helper builds on on top of this by helping to prevent developers from shooting themselves in the foot.
@@ -45,7 +47,8 @@ tags: []
     Once these schedules are created, a developer can simply register a new task in the correct one.
 </p>
 <p>
-    <strong>Logging:</strong> Cron Helper makes it easy to capture all output in a job (stderr & stdout) and
+    <strong>Logging:</strong>
+    Cron Helper makes it easy to capture all output in a job (stderr & stdout) and
     decide what to do with it.
     You have the freefrom to log it locally, send it to a remote service, or simply print it to stdout (the default behavior).
     Since it's written in Ruby, you also have the power to manipulate it, use regular expressions, or write any other custom
