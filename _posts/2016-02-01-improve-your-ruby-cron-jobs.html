@@ -27,6 +27,10 @@ tags: []
     Tasks give you guaranteed ordering within a job.
     They also give you exception handling so that a failed task won't prevent the tasks after it from executing.
     This gives you fine grained control of how and when code should execute in a job.
+    Tasks also help prevent resource starvation because they one one after another.
+    For example, say a developer wants to run twenty logical units of code every hour.
+    With Cron Helper, they are encouraged to create twenty tasks in one job since they will all execute in a single Ruby process.
+    In general, this is a much better situation to have than say twenty independent Ruby processes running in parallel.
 </p>
 <p>
     <strong>Productivity:</strong> Traditionally, creating cron jobs was a sysadmin task on a server.
@@ -43,4 +47,12 @@ tags: []
     You have the freefrom to log it locally, send it to a remote service, or simply print it to stdout (the default behavior).
     Since it's written in Ruby, you also have the power to manipulate it, use regular expressions, or write any other custom
     logic that your project requires.
+</p>
+<p>
+    <strong>Controlled concurrency</strong>
+    In Cron Helper terms, tasks force ordering and jobs permit it.
+    For exmaple, you could create two separate hourly jobs.
+    The tasks within job each are guaranteed to run in order.
+    No such guarantees are made regarding the jobs themselves since they are independent processes that are schedule
+    by your operating system.
 </p>
