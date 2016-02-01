@@ -1,0 +1,46 @@
+---
+layout: post
+title: Cron Helper - Improve your Ruby Cron jobs
+comments: false
+share: false
+date: 2016-02-01
+type: post
+tags: []
+---
+<p>
+    I've released my latest Ruby gem named <a href="https://github.com/chadrem/cron_helper">Cron Helper</a>
+    to make life easier for those Ruby & Rails projects that use <a href="https://en.wikipedia.org/wiki/Cron">Cron</a>.
+    It's designed to build on top of the <a href="https://github.com/javan/whenever">Whenever</a>
+    gem to solve a number of common problems I've encountered over the years.
+    Features include:
+</p>
+<p>
+    <strong>Prevent overlapping jobs:</strong>
+    Cron will allow overlapping jobs and this can result in race conditions, resource starvation, and other problems
+    since web developers usually don't encounter them on their development environments.
+    An example of this is an hourly job that starts taking two hours to complete.
+    Cron Helper uses file locking to prevent overlapping jobs since the general rule of thumb is that a longer running
+    job is a better situation to have than a buildup of overlapping jobs.
+</p>
+<p>
+    <strong>Tasks:</strong> Think of tasks as methods you want to execute when a specific job runs (such as an hourly job).
+    Tasks give you guaranteed ordering within a job.
+    They also give you exception handling so that a failed task won't prevent the tasks after it from executing.
+    This gives you fine grained control of how and when code should execute in a job.
+</p>
+<p>
+    <strong>Productivity:</strong> Traditionally, creating cron jobs was a sysadmin task on a server.
+    One of the great advantanges of the <a href="https://github.com/javan/whenever">Whenever</a> gem is that it gave
+    this capability to the app developer by making it a first class concept in Rails.
+    Cron Helper builds on on top of this by helping to prevent developers from shooting themselves in the foot.
+    Typically an app has a few crons on a specific schedule (hourly, weekly, daily, etc).
+    Once these schedules are created, a developer can simply register a new task in an existing job.
+    Their new task will be isolated from other tasks on the same schedule.
+</p>
+<p>
+    <strong>Logging:</strong> Cron Helper makes it easy to capture all output in a job (stderr & stdout) and
+    decide what to do with it.
+    You have the freefrom to log it locally, send it to a remote service, or simply print it to stdout (the default behavior).
+    Since it's written in Ruby, you also have the power to manipulate it, use regular expressions, or write any other custom
+    logic that your project requires.
+</p>
