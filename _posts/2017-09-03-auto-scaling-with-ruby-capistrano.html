@@ -1,0 +1,40 @@
+---
+layout: post
+title: Capistrano Releases - Auto Scaling EC2 with Capistrano
+comments: false
+share: false
+date: 2017-09-03
+type: post
+tags: []
+---
+<p>
+    I've released my latest Ruby gem named <a href="https://github.com/chadrem/capistrano-releases">Capistrano::Releases</a>
+    with the goal of making it easy to use Capistrano with Amazon's EC2 Auto Scaling feature.
+    Features:
+</p>
+<p>
+    <strong>Continue to deploy as usual:</strong>
+    This gem compliments your existing Capistrano deployment code with minimal changes.
+    This is especially useful for situations where your app started off on a single server (such as a prototype)
+    and now you want to move it to auto scaling AWS EC2 instances.
+    Another use case is for apps that have outgrown Horoku.
+</p>
+<p>
+    <strong>Store releases on AWS S3:</strong>
+    Every time you deploy with Capistrano, a new release directory is created on your server(s).
+    This poses a problem for auto scaling instances because they are created/destroyed independently of your Capistrano deploys.
+    To solve this problem, your releases get automatically compressed and stored on AWS S3.
+    This highly reliable shared storage is then used to synchronize your releases across instances.
+</p>
+<p>
+    <strong>Bundler aware:</strong>
+    Most Capistrano users choose to use Bundler for gem dependency management.
+    Capistrano::Releases is bundler aware and will store your dependencies in S3 along with your releases.
+    This means you don't have to depend on the public (or private) gem servers to be working when a new EC2 instance boots.
+</p>
+<p>
+    <strong>Simplicity:</strong>
+    The code is relatively short and pure Ruby.
+    This makes it very easy to customize for complex situations.
+    It can be used from the command line or directly through its API.
+</p>
