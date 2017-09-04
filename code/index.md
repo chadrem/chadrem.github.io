@@ -20,3 +20,4 @@ share: false
 * [Fiona](https://github.com/BlueFrogGaming/fiona)
 * [CronHelper](https://github.com/chadrem/cron_helper)
 * [Capistrano::Releases](https://github.com/chadrem/capistrano-releases)
+* [ec2_election](https://github.com/chadrem/ec2_election)
