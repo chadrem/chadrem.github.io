@@ -1,0 +1,29 @@
+---
+layout: post
+title: ec2_election - Leader election for EC2 Auto Scaling with Lambda and Python
+comments: false
+share: false
+date: 2017-09-03
+type: post
+tags: []
+---
+<p>
+    Recently I've had a need to pick a leader instance when using AWS EC2 Auto Scaling.
+    To solve this problem I've created [ec2_election](https://github.com/chadrem/ec2_election) which uses Python and AWS Lambda.
+    Benefits...
+</p>
+<p>
+    <strong>Simple:</strong>
+    The code is written in Python and is hosted as an AWS Lambda function.
+    This means you don't need to run any additional EC2 instances (yourself) for it to work.
+</p>
+<p>
+    <strong>Python:</strong>
+    All of the code is written in simple Python 2.7 syntax since this is directly supported by AWS Lambda.
+    The Boto3 SDK is used since it too is directly supported by AWS and included in AWS Lambda.
+</p>
+<p>
+    <strong>Self healing:</strong>
+    AWS Cloudwatch scheduled events or EC2 Auto Scaling events are used to trigger the Lambda function.
+    In both cases, highly reliable AWS infrastructure is used to elect a leader for your cluster.
+</p>
