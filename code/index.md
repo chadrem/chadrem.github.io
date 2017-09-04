@@ -19,3 +19,4 @@ share: false
 * [Spinal Tap](https://github.com/chadrem/spinal_tap)
 * [Fiona](https://github.com/BlueFrogGaming/fiona)
 * [CronHelper](https://github.com/chadrem/cron_helper)
+* [Capistrano::Releases](https://github.com/chadrem/capistrano-releases)
