@@ -27,7 +27,7 @@ timezone: America/New_York
 owner:
   name: Chad Remesch
   avatar: bio-photo.jpg
-  bio: "Entrepreneur, developer, and software engineer"
+  bio: "Entrepreneur, software engineer, and photographer."
   email: chad@remesch.com
   disqus-shortname:
   twitter: #username
@@ -43,7 +43,7 @@ owner:
   stackoverflow: #123456/username   from a "http://stackoverflow.com/users/123456/username" link
   linkedin: chadremesch
   xing: #username
-  instagram: #username
+  instagram: chad_remesch
   lastfm: #username
   tumblr: #username
   pinterest: #username
