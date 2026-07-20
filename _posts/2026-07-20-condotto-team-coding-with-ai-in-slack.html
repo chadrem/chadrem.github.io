@@ -1,0 +1,138 @@
+---
+title: Condotto - Team coding with AI in Slack
+date: 2026-07-20
+tags:
+- ai
+- claude
+- slack
+- typescript
+---
+<p>
+    <a href="https://github.com/chadrem/condotto">Condotto</a> gives any Slack thread its own persistent
+    <a href="https://claude.com/claude-code">Claude Code</a> session, running on your own computer against your real
+    repository and your real toolchain.
+    You describe what you want in the thread.
+    The agent writes the code and runs the tests.
+    When it reaches for something consequential, an engineer clicks Approve.
+    It's a single daemon, licensed under the AGPL.
+</p>
+<p>
+    I built it for a bottleneck on my own team.
+    At <a href="https://www.fromthelobby.com">The Lobby</a> we're small, remote first, and productive.
+    Several people there know our product and our customers better than I do.
+    They would want a change made, anything from a styling fix to a report to a critical bug,
+    and then they would wait for me to make it.
+    As CTO my job includes keeping the site running, so the obvious fix of handing everyone a development
+    environment and a deploy button isn't a fix at all.
+    What I wanted was to stop being the middle man between my team and Claude Code, and go back to being a
+    leader who guides the work.
+</p>
+<p>
+    The project was born in Lucca, Italy.
+    My wife had spent a long time planning a month abroad, which is a hard thing to do when you help run a startup.
+    I needed a way for the rest of the team to keep building while I was away from the computer.
+    It was originally called Conduit.
+    I renamed it Condotto, the Italian word, out of respect for the town where it was written.
+    I'm still on the trip, and we're using it now.
+</p>
+<p>
+    Before any of this I ran a prototype: a set of Claude Code skills and scripts that polled specific Slack
+    threads for input.
+    It worked well enough to justify the real thing, and it taught me two concrete lessons.
+    The first is that starting a session has to be automatic.
+    In the prototype I opened tmux, started a copy of Claude Code by hand, pointed it at a thread, and told the
+    team it was ready.
+    The second is that each thread needs its own git worktree, or concurrent threads clobber each other's work.
+    Both of those are now core to how Condotto works.
+</p>
+<p>
+    <strong>Threads are sessions:</strong>
+    An architect assigns a thread with a slash command, and Condotto posts an anchor message whose thread becomes
+    the session.
+    Slack won't let a custom slash command run inside a thread, so claiming an existing thread is done by
+    mentioning the bot instead.
+    The session parks when the thread goes quiet and resumes with the same history whenever someone replies.
+    One conversation maps to one session for its entire life.
+</p>
+<p>
+    <strong>A worktree per thread:</strong>
+    Each session gets a fresh <a href="https://git-scm.com/docs/git-worktree">git worktree</a> off the default branch.
+    Threads can't step on each other, and the agent only ever sees committed content, never your working tree or
+    your ignored files.
+    This isn't the final answer.
+    I expect to offer stronger options over time, such as a fully self contained development environment per thread.
+</p>
+<p>
+    <strong>Approvals are mechanical:</strong>
+    Every tool call is sorted before it runs.
+    Reads and analysis run freely, because a conversation that stalls for permission to read a file is useless.
+    Writes, arbitrary shell, production data access and the deploy path pause un-executed until an architect approves.
+    A hard deny floor refuses a few things for everyone regardless of who asks.
+    The important part is that this happens at the tool boundary rather than in a prompt.
+    By the time a command shows up in a transcript it has already run, so watching output is not enforcement.
+</p>
+<p>
+    <strong>Roles and delegation:</strong>
+    Approvals are checked server side against a verified Slack user ID, never a display name and never text in a
+    message body.
+    My prototype ran on a written protocol instead, and a message body could forge a header attributing a command to me.
+    Architects can grant authority to other people at runtime without a config edit or a restart, which is how a
+    domain expert graduates into driving sessions on their own.
+</p>
+<p>
+    <strong>Everything is audited:</strong>
+    Tool calls, approval requests, who clicked what, deploys and session lifecycle all go to an append only log in
+    SQLite.
+    You query it with any SQLite client.
+</p>
+<p>
+    My co-founder Abigail Holtz is the reason this exists in its current shape.
+    She's an excellent product manager and an AI first CEO.
+    She writes specs, builds features, improves our UI and pulls reports from production, and she's good enough with
+    these tools to catch Claude's mistakes and push back on them.
+    Slack is what makes that work.
+    She can do all of it in the open while I follow along and add my two cents where it's useful, and when she asks
+    me a question directly in the thread, Claude sees my answer too.
+</p>
+<p>
+    <strong>What I left out.</strong>
+    Condotto is meant to be a simple, self contained tool that does one thing well.
+    Almost all of the management tooling I can imagine has been left out on purpose.
+    Standardized development environments, a Dev Container per thread, policy dashboards, fleet management across
+    several daemons, a read only audit channel in Slack.
+    There's a long list of things worth building for both startups and enterprises, and they belong on top of
+    Condotto rather than inside it.
+    I also cut per session process isolation, because its only real justification was containing a hostile session,
+    and that isn't a boundary that exists inside a team that already trusts each other.
+</p>
+<p>
+    That trust assumption is the part I most want people to get right.
+    Condotto is built for a small team whose members trust one another and whose architect self hosts it.
+    The skill levels on that team can vary widely, and helping with exactly that is the point.
+    It is not a multi-tenant product and it is not hardened against a hostile insider.
+    Don't put it in a public Slack and let strangers drive your instance.
+</p>
+<p>
+    <strong>TypeScript, Bun, and the Agent SDK.</strong>
+    The biggest surprise in this project was learning that the
+    <a href="https://code.claude.com/docs/en/agent-sdk/overview">Agent SDK</a> exists at all.
+    I had assumed everything I wanted was welded into the Claude Code command line app.
+    It isn't.
+    Anthropic structured it so the agent can be embedded in other products, and that is what made Condotto practical.
+    I wrote it in TypeScript on <a href="https://bun.sh">Bun</a> because that's what Anthropic used for Claude Code,
+    and there was no reason to reinvent the wheel or give up the benefit of their work.
+    Condotto is fully AI coded with me as the architect, which is the same arrangement it gives everyone else.
+</p>
+<p>
+    The hardest part was integrating a closed source application.
+    Claude Code has a real API, but it also has a large surface of built in commands and features, and not all of
+    them are exposed through Condotto yet.
+    I'll keep exposing more as we hit the need for them.
+    If I run into a wall I can move to headless mode or drive the real application through a terminal emulator, but
+    neither has been necessary.
+</p>
+<p>
+    Slack and Claude Code are the current integrations, not the only possible ones.
+    The core is written against two interfaces, one for the chat surface and one for the coding agent, so Teams,
+    Discord, Codex or OpenCode can be added without touching it.
+</p>
