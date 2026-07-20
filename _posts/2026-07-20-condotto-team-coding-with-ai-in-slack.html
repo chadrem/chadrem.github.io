@@ -38,52 +38,17 @@ tags:
 <p>
     Before any of this I ran a prototype: a set of Claude Code skills and scripts that polled specific Slack
     threads for input.
-    It worked well enough to justify the real thing, and it taught me two concrete lessons.
+    It worked well enough to justify the real thing, and it taught me three concrete lessons.
     The first is that starting a session has to be automatic.
     In the prototype I opened tmux, started a copy of Claude Code by hand, pointed it at a thread, and told the
     team it was ready.
     The second is that each thread needs its own git worktree, or concurrent threads clobber each other's work.
-    Both of those are now core to how Condotto works.
-</p>
-<p>
-    <strong>Threads are sessions:</strong>
-    An architect assigns a thread with a slash command, and Condotto posts an anchor message whose thread becomes
-    the session.
-    Slack won't let a custom slash command run inside a thread, so claiming an existing thread is done by
-    mentioning the bot instead.
-    The session parks when the thread goes quiet and resumes with the same history whenever someone replies.
-    One conversation maps to one session for its entire life.
-</p>
-<p>
-    <strong>A worktree per thread:</strong>
-    Each session gets a fresh <a href="https://git-scm.com/docs/git-worktree">git worktree</a> off the default branch.
-    Threads can't step on each other, and the agent only ever sees committed content, never your working tree or
-    your ignored files.
-    This isn't the final answer.
-    I expect to offer stronger options over time, such as a fully self contained development environment per thread.
-</p>
-<p>
-    <strong>Approvals are mechanical:</strong>
-    Every tool call is sorted before it runs.
-    Reads and analysis run freely, because a conversation that stalls for permission to read a file is useless.
-    Writes, arbitrary shell, production data access and the deploy path pause un-executed until an architect approves.
-    A hard deny floor refuses a few things for everyone regardless of who asks.
-    The important part is that this happens at the tool boundary rather than in a prompt.
+    The third came from a hole in the prototype itself.
+    Authority ran on a written protocol saying only my verified Slack ID could approve a build, and a message
+    body could forge a header attributing a command to me.
+    That's why Condotto checks approvals server side against a verified user ID, and why every tool call is
+    sorted before it runs rather than after.
     By the time a command shows up in a transcript it has already run, so watching output is not enforcement.
-</p>
-<p>
-    <strong>Roles and delegation:</strong>
-    Approvals are checked server side against a verified Slack user ID, never a display name and never text in a
-    message body.
-    My prototype ran on a written protocol instead, and a message body could forge a header attributing a command to me.
-    Architects can grant authority to other people at runtime without a config edit or a restart, which is how a
-    domain expert graduates into driving sessions on their own.
-</p>
-<p>
-    <strong>Everything is audited:</strong>
-    Tool calls, approval requests, who clicked what, deploys and session lifecycle all go to an append only log in
-    SQLite.
-    You query it with any SQLite client.
 </p>
 <p>
     My co-founder Abigail Holtz is the reason this exists in its current shape.
