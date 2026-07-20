@@ -49,16 +49,6 @@ body {
   gap: 0.6rem;
 }
 
-/* A steady status dot: the one nod to the instrumentation this site is about. */
-.masthead__dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-wash);
-  flex: none;
-}
-
 .nav {
   display: flex;
   align-items: center;

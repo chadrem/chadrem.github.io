@@ -1,9 +1,6 @@
 <header class="masthead">
   <div class="masthead__inner shell">
-    <a class="masthead__brand" href="{{ '/' | relative_url }}">
-      <span class="masthead__dot" aria-hidden="true"></span>
-      {{ site.title }}
-    </a>
+    <a class="masthead__brand" href="{{ '/' | relative_url }}">{{ site.title }}</a>
 
     <nav class="nav" aria-label="Main">
       {%- for link in site.data.navigation %}

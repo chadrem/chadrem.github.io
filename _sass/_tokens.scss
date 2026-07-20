@@ -1,8 +1,12 @@
 /* Design tokens
    ==========================================================================
-   Cool slate neutrals with a single indigo signal colour. The accent is
-   rationed: links, trace nodes and focus rings only. Everything else is
-   monochrome so the archive rail stays the loudest thing on the page. */
+   No hue anywhere. Chad's photographs are monochrome, so the interface is too:
+   state is carried by value, weight and underline rather than colour.
+
+   The neutrals are very slightly cool — a cold-tone print rather than default
+   browser grey. Links are the highest-contrast text on the page (--ink against
+   --ink-soft body copy), which is what makes them read as links without a
+   signal colour. --mark is the filled state: trace nodes and focus rings. */
 
 :root {
   color-scheme: light dark;
@@ -14,11 +18,9 @@
   --muted: #5c636e;
   --rule: #e4e6ea;
   --rule-strong: #cfd3da;
-  --accent: #4b45d8;
-  --accent-hover: #322cb8;
-  --accent-wash: #eeeefc;
+  --mark: #14161a;
   --code-bg: #f4f5f7;
-  --selection: #dcdaff;
+  --selection: #dee2e7;
 
   --font-display: "Instrument Sans", ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", sans-serif;
@@ -47,16 +49,14 @@
   :root {
     --paper: #0e1014;
     --surface: #15181e;
-    --ink: #e7e9ec;
+    --ink: #eceef1;
     --ink-soft: #c3c8d0;
     --muted: #939aa5;
     --rule: #242931;
-    --rule-strong: #343b45;
-    --accent: #9a94ff;
-    --accent-hover: #b7b2ff;
-    --accent-wash: #1c1f33;
+    --rule-strong: #3a414c;
+    --mark: #eceef1;
     --code-bg: #1a1e25;
-    --selection: #2e2b5c;
+    --selection: #2b313b;
   }
 }
 
@@ -66,16 +66,14 @@
   color-scheme: dark;
   --paper: #0e1014;
   --surface: #15181e;
-  --ink: #e7e9ec;
+  --ink: #eceef1;
   --ink-soft: #c3c8d0;
   --muted: #939aa5;
   --rule: #242931;
-  --rule-strong: #343b45;
-  --accent: #9a94ff;
-  --accent-hover: #b7b2ff;
-  --accent-wash: #1c1f33;
+  --rule-strong: #3a414c;
+  --mark: #eceef1;
   --code-bg: #1a1e25;
-  --selection: #2e2b5c;
+  --selection: #2b313b;
 }
 
 :root[data-theme="light"] {
@@ -87,9 +85,7 @@
   --muted: #5c636e;
   --rule: #e4e6ea;
   --rule-strong: #cfd3da;
-  --accent: #4b45d8;
-  --accent-hover: #322cb8;
-  --accent-wash: #eeeefc;
+  --mark: #14161a;
   --code-bg: #f4f5f7;
-  --selection: #dcdaff;
+  --selection: #dee2e7;
 }

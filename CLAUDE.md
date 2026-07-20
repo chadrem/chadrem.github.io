@@ -42,6 +42,12 @@ Structural changes to the shell go in `default.html` only.
 
 **Styles.** `assets/css/main.scss` (front matter makes Jekyll compile it) pulls partials from `_sass/` with `@use`, in cascade order: `tokens` → `base` → `layout` → `archive` → `prose` → `syntax` → `print`. Dart Sass (`sass-embedded`) does the compiling — `@import` is deprecated, so keep using `@use`.
 
+**The palette has no hue, and that is deliberate** — Chad's photography is monochrome, so the interface is too. There is no accent colour. State is carried by value, weight and underline instead: links are the highest-contrast text on the page (`--ink` against `--ink-soft` body copy) plus a quiet underline that resolves to full contrast on hover, and `--mark` is the filled state for trace nodes and focus rings. Don't reintroduce a signal colour without asking; a chromatic accent next to the photographs is what this replaced.
+
+Two consequences worth knowing. Components that aren't running text (nav, cards, archive rows) opt out with `text-decoration: none`, so a global underline on `a` is safe. And never set `text-decoration: underline` shorthand on a link — it resets `text-decoration-color` to `currentColor` and defeats the quiet underline; set `text-decoration-line` alone if you need it.
+
+`_sass/_syntax.scss` is monochrome for the same reason, differentiating tokens by weight and slope rather than colour. Only one post currently has a code block, so this is mostly forward provision — it's the one file to revisit if highlighted code ever becomes central.
+
 All theming is CSS custom properties defined in `_sass/_tokens.scss`. Light and dark values are declared three times on purpose: `:root`, a `prefers-color-scheme: dark` block, and `:root[data-theme="…"]` blocks so an explicit toggle choice beats the OS preference in both directions. Change a colour in all the relevant blocks or the themes drift apart.
 
 The archive "trace rail" in `_sass/_archive.scss` is the site's signature element. Its geometry is interlocked: `.trace` has `padding-left: var(--rail)`, and `.trace::before` (the rail) sits at `left: calc(var(--rail) - 1px)`, which is **x = -1px in the coordinate space of the child elements**. The year tick and post nodes are positioned against that. Changing `--rail` is safe; changing the offsets is not.

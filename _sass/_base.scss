@@ -44,16 +44,19 @@ p {
   text-wrap: pretty;
 }
 
+/* Without a signal colour, links lean on two things: they are the darkest text
+   around them, and they are underlined. The underline starts quiet and resolves
+   to full contrast on hover. Components that aren't running text (nav, cards,
+   the archive rows) opt out with text-decoration: none. */
 a {
-  color: var(--accent);
-  text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  color: var(--ink);
+  text-decoration-color: var(--rule-strong);
   text-underline-offset: 0.18em;
   text-decoration-thickness: 1px;
-  transition: color 0.15s var(--ease);
+  transition: text-decoration-color 0.15s var(--ease);
 }
 
 a:hover {
-  color: var(--accent-hover);
   text-decoration-color: currentColor;
 }
 
@@ -77,7 +80,7 @@ kbd {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--mark);
   outline-offset: 3px;
   border-radius: 2px;
 }
