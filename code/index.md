@@ -5,6 +5,7 @@ comments: false
 share: false
 ---
 
+* [Condotto](https://github.com/chadrem/condotto)
 * [Market Bot](https://github.com/chadrem/market_bot)
 * [Officer](https://github.com/chadrem/officer)
 * [Easy Lua](https://github.com/chadrem/easy_lua)
