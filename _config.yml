@@ -1,10 +1,10 @@
 # Site-wide configuration
 
 title: Chad Remesch
-tagline: Entrepreneur and software engineer
+tagline: Entrepreneur, software engineer, dad of two, photographer
 description: >-
-  Notes on Ruby concurrency, distributed systems and the gems that come out of
-  building them — by Chad Remesch.
+  Chad Remesch — entrepreneur, software engineer, dad of two and photographer.
+  Writing mostly about Ruby, concurrency and distributed systems.
 locale: en_US
 lang: en
 url: https://remesch.com
@@ -47,7 +47,7 @@ defaults:
 owner:
   name: Chad Remesch
   avatar: bio-photo.jpg
-  bio: "Entrepreneur and software engineer. I build Ruby concurrency tools."
+  bio: "Entrepreneur and software engineer. Dad of two wonderful kids. Photographer."
   email: chad@remesch.com
   github: chadrem
   linkedin: chadremesch

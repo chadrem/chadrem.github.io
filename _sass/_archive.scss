@@ -2,7 +2,18 @@
    ==========================================================================
    The signature element. Posts are a genuine chronological sequence, so the
    rail encodes real information: years are markers on a running trace and each
-   post is a node on it. Nothing else on the site uses this treatment. */
+   post is a node on it. Nothing else on the site uses this treatment.
+
+   Geometry, left to right:
+
+     |<-- --rail -->|<-- --rail-gap -->|
+     2017 ----------|                  ec2_election — Leader election…
+                    ^ rail line        ^ content edge
+
+   The container is padded by (--rail + --rail-gap), so in the coordinate space
+   of the children the rail line sits at x = -(--rail-gap). Every offset below
+   is derived from that, which is why the two tokens can change freely but the
+   expressions cannot. */
 
 .intro {
   max-width: 46rem;
@@ -19,7 +30,6 @@
 
 .intro__title {
   font-size: var(--step-4);
-  margin-bottom: 1.1rem;
 }
 
 .intro__lede {
@@ -27,6 +37,7 @@
   font-size: var(--step-1);
   line-height: 1.5;
   color: var(--ink-soft);
+  margin-top: 1.1rem;
 }
 
 .intro__lede a {
@@ -38,7 +49,7 @@
 
 .trace {
   position: relative;
-  padding-left: var(--rail);
+  padding-left: calc(var(--rail) + var(--rail-gap));
 }
 
 /* The running trace itself. Solid from the first year marker, fading out at the
@@ -46,7 +57,7 @@
 .trace::before {
   content: "";
   position: absolute;
-  left: calc(var(--rail) - 1px);
+  left: var(--rail);
   top: 0.55rem;
   bottom: 0;
   width: 1px;
@@ -72,23 +83,24 @@
   margin-top: 0;
 }
 
-/* Year marker sits in the gutter, straddling the rail. */
+/* Year marker, right-aligned in the gutter and stopping short of the rail to
+   leave room for the tick. */
 .trace__year-label {
   position: absolute;
-  left: calc(var(--rail) * -1);
-  width: calc(var(--rail) - 0.9rem);
+  left: calc((var(--rail) + var(--rail-gap)) * -1);
+  width: calc(var(--rail) - 0.5rem);
   text-align: right;
   color: var(--ink);
 }
 
-/* Tick joining the year label to the rail. Must reach x=0, which is where the
-   rail sits in this element's coordinate space. */
+/* Tick joining the label to the rail: spans the 0.5rem the label gave up and
+   ends exactly on the rail at x = -(--rail-gap). */
 .trace__year::after {
   content: "";
   position: absolute;
-  left: -0.9rem;
+  left: calc(var(--rail-gap) * -1 - 0.5rem);
   top: 0.62em;
-  width: 0.9rem;
+  width: 0.5rem;
   height: 1px;
   background: var(--rule-strong);
 }
@@ -109,11 +121,11 @@
   border-bottom: 0;
 }
 
-/* Node on the rail. Hollow by default, fills on hover/focus. */
+/* Node centred on the rail. Hollow by default, fills on hover/focus. */
 .trace__item::before {
   content: "";
   position: absolute;
-  left: calc(-0.9rem - 3.5px);
+  left: calc(var(--rail-gap) * -1 - 3.5px);
   top: 1.55rem;
   width: 8px;
   height: 8px;
@@ -168,17 +180,13 @@
   margin-top: 0.45rem;
 }
 
+/* Below the year gutter's useful width, collapse it: the rail moves to the far
+   left and years become inline headings. The offsets above all follow from the
+   two tokens, so only the label and tick need overriding. */
 @media (max-width: 40rem) {
   :root {
     --rail: 0px;
-  }
-
-  .trace {
-    padding-left: 1.1rem;
-  }
-
-  .trace::before {
-    left: 0;
+    --rail-gap: 1.1rem;
   }
 
   .trace__year-label {
@@ -190,16 +198,6 @@
 
   .trace__year::after {
     display: none;
-  }
-
-  .trace__item::before {
-    left: -1.1rem;
-    transform: translateX(-3.5px);
-  }
-
-  .trace__item:hover::before,
-  .trace__item:focus-within::before {
-    transform: translateX(-3.5px) scale(1.35);
   }
 }
 
