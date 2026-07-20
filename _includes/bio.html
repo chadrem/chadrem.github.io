@@ -1,11 +1,15 @@
 <aside class="bio">
   <img
     class="bio__avatar"
-    src="{{ site.owner.avatar | prepend: '/images/' | relative_url }}"
-    alt=""
+    src="{{ '/images/avatar-104.jpg' | relative_url }}"
+    srcset="{{ '/images/avatar-104.jpg' | relative_url }} 104w,
+            {{ '/images/avatar-208.jpg' | relative_url }} 208w"
+    sizes="52px"
+    alt="Chad Remesch holding a rangefinder camera to his eye."
     width="52"
     height="52"
-    loading="lazy">
+    loading="lazy"
+    decoding="async">
   <div>
     <p class="bio__name">{{ site.owner.name }}</p>
     <p class="bio__text">{{ site.owner.bio }}</p>

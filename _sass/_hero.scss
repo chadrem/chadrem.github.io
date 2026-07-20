@@ -1,0 +1,92 @@
+/* Home hero
+   ==========================================================================
+   Two of Chad's own photographs. The shoreline runs as a wide plate; the
+   self-portrait sits beneath it as a byline mark next to his name.
+
+   Both carry the same hairline the trace rail and section rules use, so the
+   photographs read as part of the page rather than dropped into it. */
+
+.hero {
+  margin-bottom: clamp(3rem, 2rem + 4vw, 4.5rem);
+}
+
+.hero__plate,
+.hero__portrait {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  background: var(--code-bg);
+}
+
+.hero__plate {
+  /* The frame is 3:2. Shown wider than that so the hero doesn't push the
+     archive off the first screen — the empty sky takes the crop. */
+  aspect-ratio: 2 / 1;
+  border-radius: var(--radius);
+}
+
+.hero__plate img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 55%;
+}
+
+.hero__byline {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.9rem, 0.5rem + 1.6vw, 1.4rem);
+  margin-top: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+}
+
+.hero__portrait {
+  flex: none;
+  width: clamp(5rem, 3.4rem + 6vw, 6.5rem);
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+}
+
+.hero__portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero__text {
+  min-width: 0;
+}
+
+/* Flex rather than inline text: Liquid's whitespace control strips the spaces
+   between the spans, so the gap comes from the layout instead. */
+.hero__roles {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1ch;
+  row-gap: 0.15rem;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  margin-bottom: 0.35rem;
+}
+
+/* Wrap between roles, never inside one — "dad of two" stays on one line. */
+.hero__role {
+  white-space: nowrap;
+}
+
+.hero__name {
+  font-size: var(--step-3);
+  letter-spacing: -0.028em;
+}
+
+@media (max-width: 40rem) {
+  .hero__plate {
+    /* Narrow viewport has the vertical room, so give the frame back its shape. */
+    aspect-ratio: 3 / 2;
+  }
+
+  .hero__roles {
+    line-height: 1.5;
+  }
+}

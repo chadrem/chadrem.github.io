@@ -49,3 +49,19 @@ The archive "trace rail" in `_sass/_archive.scss` is the site's signature elemen
 **JavaScript is a single unbundled file.** `assets/js/main.js` is plain ES5, no dependencies, loaded with `defer`, and only handles the theme toggle. There is no build step — edit it and it ships. The pre-paint theme resolution is a separate inline script in `_includes/head.html` and must stay inline and render-blocking to avoid a flash of the wrong theme.
 
 **Icons are inline SVG** via `{% include icon.html name="github" %}` (see `_includes/icon.html` for the set). Font Awesome and its webfonts are gone.
+
+**Photographs.** The home hero (`_includes/hero.html`, styled by `_sass/_hero.scss`) uses two of Chad's own photographs: a shoreline plate and a self-portrait byline mark. Both are served as `<picture>` with WebP and a JPEG fallback, at three widths each.
+
+The derivatives in `images/` are generated, not hand-edited — regenerate them from the originals rather than resaving. The shoreline original is a 3:2 frame letterboxed inside a 2048² white square, so it needs cropping first:
+
+```bash
+# shoreline: lift the real frame out of the white square
+magick background.jpg -crop 2048x1374+0+336 +repage -colorspace Gray \
+  -resize 900x -quality 84 -sampling-factor 1x1 -strip images/shore-900.jpg
+# portrait: already full-bleed square
+magick profile.jpg -colorspace Gray -resize 600x -quality 84 -strip images/portrait-600.jpg
+```
+
+Keep `-colorspace Gray` (they're monochrome, so colour channels are wasted bytes) and don't push quality below ~80 — these are grainy film scans and aggressive compression smears the grain into mud. `images/og.jpg` is the 1200×630 social card, set site-wide via `image:` in `_config.yml`.
+
+Hero roles come from the `roles:` list in `_config.yml`, rendered as spans with `white-space: nowrap` so a phrase like "dad of two" never breaks across lines. The gap between them is a flex `column-gap`, not a literal space — Liquid's whitespace control strips spaces between the spans.

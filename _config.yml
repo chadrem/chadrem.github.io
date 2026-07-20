@@ -1,7 +1,13 @@
 # Site-wide configuration
 
 title: Chad Remesch
-tagline: Entrepreneur, software engineer, dad of two, photographer
+# Rendered as one comma-separated line in the hero. Kept as a list so each
+# phrase stays intact when the line wraps on narrow screens.
+roles:
+  - Entrepreneur
+  - software engineer
+  - dad of two
+  - photographer
 description: >-
   Chad Remesch — entrepreneur, software engineer, dad of two and photographer.
   Writing mostly about Ruby, concurrency and distributed systems.
@@ -36,6 +42,12 @@ feed:
   path: feed.xml
 
 defaults:
+  # jekyll-seo-tag reads `image` from a page, not from site config, so the
+  # social-preview default has to be applied as front matter.
+  - scope:
+      path: ""
+    values:
+      image: /images/og.jpg
   - scope:
       path: ""
       type: posts
@@ -46,7 +58,6 @@ defaults:
 
 owner:
   name: Chad Remesch
-  avatar: bio-photo.jpg
   bio: "Entrepreneur and software engineer. Dad of two wonderful kids. Photographer."
   email: chad@remesch.com
   github: chadrem

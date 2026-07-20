@@ -1,0 +1,57 @@
+{%- comment -%}
+  Home hero. The shoreline is the work; the portrait is the byline.
+  Both are Chad's own photographs, so they lead rather than decorate.
+{%- endcomment -%}
+<header class="hero">
+  <figure class="hero__plate">
+    <picture>
+      <source
+        type="image/webp"
+        srcset="{{ '/images/shore-600.webp' | relative_url }} 600w,
+                {{ '/images/shore-900.webp' | relative_url }} 900w,
+                {{ '/images/shore-1200.webp' | relative_url }} 1200w"
+        sizes="(max-width: 60rem) 100vw, 58rem">
+      <img
+        src="{{ '/images/shore-900.jpg' | relative_url }}"
+        srcset="{{ '/images/shore-600.jpg' | relative_url }} 600w,
+                {{ '/images/shore-900.jpg' | relative_url }} 900w,
+                {{ '/images/shore-1200.jpg' | relative_url }} 1200w"
+        sizes="(max-width: 60rem) 100vw, 58rem"
+        width="2048"
+        height="1374"
+        alt="Fog over an empty shoreline, a single bird in flight above the surf."
+        fetchpriority="high"
+        decoding="async">
+    </picture>
+  </figure>
+
+  <div class="hero__byline">
+    <figure class="hero__portrait">
+      <picture>
+        <source
+          type="image/webp"
+          srcset="{{ '/images/portrait-400.webp' | relative_url }} 400w,
+                  {{ '/images/portrait-600.webp' | relative_url }} 600w"
+          sizes="(max-width: 40rem) 5rem, 6.5rem">
+        <img
+          src="{{ '/images/portrait-400.jpg' | relative_url }}"
+          srcset="{{ '/images/portrait-400.jpg' | relative_url }} 400w,
+                  {{ '/images/portrait-600.jpg' | relative_url }} 600w"
+          sizes="(max-width: 40rem) 5rem, 6.5rem"
+          width="2048"
+          height="2048"
+          alt="Chad Remesch holding a rangefinder camera to his eye."
+          decoding="async">
+      </picture>
+    </figure>
+
+    <div class="hero__text">
+      <p class="hero__roles">
+        {%- for role in site.roles -%}
+          <span class="hero__role">{{ role }}{% unless forloop.last %},{% endunless %}</span>
+        {%- endfor -%}
+      </p>
+      <h1 class="hero__name">{{ site.owner.name }}</h1>
+    </div>
+  </div>
+</header>
