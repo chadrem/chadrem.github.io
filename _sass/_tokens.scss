@@ -3,24 +3,29 @@
    No hue anywhere. Chad's photographs are monochrome, so the interface is too:
    state is carried by value, weight and underline rather than colour.
 
-   The neutrals are very slightly cool — a cold-tone print rather than default
-   browser grey. Links are the highest-contrast text on the page (--ink against
-   --ink-soft body copy), which is what makes them read as links without a
-   signal colour. --mark is the filled state: trace nodes and focus rings. */
+   Every value is a TRUE neutral: R, G and B are equal. An earlier pass used
+   slightly blue-tinted greys and the dark background read as violet — at very
+   low lightness even ~18% saturation is visible, especially on OLED and
+   wide-gamut displays. Keep these strictly grey; if you restyle, match
+   luminance rather than eyeballing, so contrast ratios hold.
+
+   Links are the highest-contrast text on the page (--ink against --ink-soft
+   body copy), which is what makes them read as links without a signal colour.
+   --mark is the filled state: trace nodes and focus rings. */
 
 :root {
   color-scheme: light dark;
 
-  --paper: #fafafb;
+  --paper: #fafafa;
   --surface: #ffffff;
-  --ink: #14161a;
-  --ink-soft: #3a4049;
-  --muted: #5c636e;
-  --rule: #e4e6ea;
-  --rule-strong: #cfd3da;
-  --mark: #14161a;
-  --code-bg: #f4f5f7;
-  --selection: #dee2e7;
+  --ink: #161616;
+  --ink-soft: #3f3f3f;
+  --muted: #626262;
+  --rule: #e6e6e6;
+  --rule-strong: #d3d3d3;
+  --mark: #161616;
+  --code-bg: #f5f5f5;
+  --selection: #e2e2e2;
 
   --font-display: "Instrument Sans", ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", sans-serif;
@@ -47,16 +52,16 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #0e1014;
-    --surface: #15181e;
-    --ink: #eceef1;
-    --ink-soft: #c3c8d0;
-    --muted: #939aa5;
-    --rule: #242931;
-    --rule-strong: #3a414c;
-    --mark: #eceef1;
-    --code-bg: #1a1e25;
-    --selection: #2b313b;
+    --paper: #101010;
+    --surface: #181818;
+    --ink: #eeeeee;
+    --ink-soft: #c8c8c8;
+    --muted: #999999;
+    --rule: #292929;
+    --rule-strong: #404040;
+    --mark: #eeeeee;
+    --code-bg: #1e1e1e;
+    --selection: #313131;
   }
 }
 
