@@ -1,0 +1,31 @@
+<footer class="footer">
+  <div class="footer__inner shell">
+    <span class="footer__copy">&copy; {{ site.time | date: '%Y' }} {{ site.owner.name }}</span>
+
+    <div class="social">
+      {%- if site.owner.github %}
+        <a class="social__link" href="https://github.com/{{ site.owner.github }}" rel="me noopener" aria-label="GitHub">
+          {% include icon.html name="github" %}
+        </a>
+      {%- endif %}
+      {%- if site.owner.linkedin %}
+        <a class="social__link" href="https://www.linkedin.com/in/{{ site.owner.linkedin }}" rel="me noopener" aria-label="LinkedIn">
+          {% include icon.html name="linkedin" %}
+        </a>
+      {%- endif %}
+      {%- if site.owner.instagram %}
+        <a class="social__link" href="https://www.instagram.com/{{ site.owner.instagram }}" rel="me noopener" aria-label="Instagram">
+          {% include icon.html name="instagram" %}
+        </a>
+      {%- endif %}
+      {%- if site.owner.email %}
+        <a class="social__link" href="mailto:{{ site.owner.email }}" aria-label="Email">
+          {% include icon.html name="mail" %}
+        </a>
+      {%- endif %}
+      <a class="social__link" href="{{ '/feed.xml' | relative_url }}" aria-label="Atom feed">
+        {% include icon.html name="rss" %}
+      </a>
+    </div>
+  </div>
+</footer>

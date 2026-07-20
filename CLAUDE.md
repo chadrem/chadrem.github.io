@@ -4,46 +4,48 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Chad Remesch's personal blog (remesch.com) — a Jekyll site built on the **Minimal Mistakes** theme (Michael Rose), hosted on **GitHub Pages** as a user site (`chadrem/chadrem.github.io`). Pushing to `master` deploys; there is no build/CI step. `CNAME` pins the custom domain, `_site/` is generated locally and gitignored (GitHub builds its own copy).
+Chad Remesch's personal blog (remesch.com) — a **Jekyll 4** site with a hand-rolled theme, hosted on **GitHub Pages** as a user site (`chadrem/chadrem.github.io`). `CNAME` pins the custom domain; `_site/` is generated and gitignored.
 
-Ruby is pinned to 2.6.10 (`.ruby-version`) and Jekyll comes from the `github-pages` gem (currently Jekyll 3.9.2), so keep to Jekyll 3 + GitHub Pages' plugin whitelist.
+Ruby is pinned to 4.0.6 (`.ruby-version`). The site does **not** use the `github-pages` gem — that gem caps Jekyll at 3.x and cannot install on modern Ruby. Jekyll comes straight from `Gemfile`, so any plugin is fair game, not just GitHub's whitelist.
+
+## Deployment
+
+Pushing to `master` triggers `.github/workflows/pages.yml`, which builds with Jekyll and publishes via `actions/deploy-pages`. **GitHub's built-in Jekyll build is not used** — the repo's Pages source must stay set to "GitHub Actions" (Settings → Pages). If it is ever flipped back to "Deploy from a branch", GitHub will try to build with Jekyll 3 and the site will break.
 
 ## Commands
 
 ```bash
-bundle install                    # Ruby deps (Jekyll via github-pages gem)
-bundle exec jekyll serve          # local preview at http://127.0.0.1:4000
-bundle exec jekyll build          # write _site/
-
-npm install                       # Grunt toolchain (very old; Node >= 0.10 era)
-grunt                             # clean + uglify JS + optimize images
-grunt dev                         # watch: jshint + uglify on JS change
-grunt images                      # imagemin + svgmin over images/
+bundle install               # Ruby deps
+bundle exec jekyll serve     # local preview at http://127.0.0.1:4000
+bundle exec jekyll build     # write _site/
 ```
 
-There are no tests and no linter beyond `jshint` on `assets/js/*.js` via Grunt.
+No Node, no Grunt, no tests, no linter. `bundle exec jekyll build` failing is the only build signal.
 
-### Local preview gotcha
-
-Every template prefixes URLs with `{{ site.url }}`, which is `http://remesch.com` in `_config.yml`. Under a plain `jekyll serve`, links and CSS/JS references point at the live site rather than localhost. To preview a real local build, override it:
-
-```bash
-bundle exec jekyll serve --config _config.yml,<(echo 'url: "http://localhost:4000"')
-```
+URLs are emitted with the `relative_url` filter, so `jekyll serve` works directly — no `site.url` override needed.
 
 ## Architecture
 
-**Content → layout → includes.** Four layouts in `_layouts/`, each a full HTML document that repeats the same skeleton (`_head.html` → `_browser-upgrade.html` → `_navigation.html` → content → `_footer.html` → `_scripts.html`). There is no base/default layout, so structural changes to the page shell must be made in all four:
+**One base layout.** `_layouts/default.html` holds the entire page shell (head → masthead → `{{ content }}` → footer → JS). The other three set `layout: default` in their own front matter and render only their content:
 
-- `home.html` — 5 most recent posts (unused; `index.md` uses `post-index`)
-- `post-index.html` — all posts grouped by year (`index.md`, `posts/index.md`)
-- `post.html` — single post
+- `post-index.html` — all posts grouped by year (`index.md`, `posts/index.md`). Renders the intro block when `page.intro` is set, otherwise a plain page header.
+- `post.html` — single post, plus tags and prev/next navigation
 - `page.html` — standalone pages (`about/`, `code/`, `404.md`)
 
-**Site metadata lives in `_config.yml` under `owner:`.** Social links, Google Analytics ID, Disqus shortname, avatar, and bio are all read from `site.owner.*` by `_includes/_author-bio.html`, `_footer.html`, `_scripts.html`, and `_open-graph.html`. Blank keys deliberately disable features (empty `disqus-shortname` suppresses comments everywhere). Nav links come from `_data/navigation.yml`.
+Structural changes to the shell go in `default.html` only.
 
-**Posts are `.html`, not Markdown.** All 24 files in `_posts/` are hand-written HTML with YAML front matter, named `YYYY-MM-DD-slug.html`, permalink `/:year/:month/:day/:title/`. Front matter in use: `layout, title, comments, share, date, type, tags`. `_templates/` holds Octopress-style scaffolds (post/page/archive) referenced by `_octopress.yml` — the octopress gem is *not* in the Gemfile, so copy these by hand.
+**Plugins do the metadata.** `jekyll-seo-tag` generates `<title>`, description, canonical, Open Graph, Twitter cards and JSON-LD from `_config.yml` + front matter; `jekyll-feed` generates `/feed.xml`; `jekyll-sitemap` generates `/sitemap.xml`. There are no hand-written equivalents — don't reintroduce them. Per-page overrides go in front matter (`title`, `description`, `image`).
 
-**Styles.** `assets/css/main.scss` (front matter makes Jekyll compile it) imports partials from `_sass/` in a fixed order — `variables` first, then layout/typography/syntax/element partials, then `_sass/vendor/` (font-awesome, magnific-popup), then `print`. Theme knobs (fonts, colors, breakpoints) live in `_sass/variables.scss`. Sass output is `compressed` per `_config.yml`.
+**Site metadata lives in `_config.yml` under `owner:`.** Social links, avatar and bio are read from `site.owner.*` by `_includes/footer.html` and `bio.html`. Nav links come from `_data/navigation.yml`. Analytics, Disqus and share buttons were all removed — every post was `comments: false` / `share: false`, and the Universal Analytics property had been dead since 2023.
 
-**JavaScript is a build artifact.** `assets/js/scripts.min.js` is committed and is what `_scripts.html` loads. Grunt's `uglify` concatenates `assets/js/plugins/*.js` (fitVids, magnific-popup) + `assets/js/_*.js` (`_main.js`) into it. **Editing `_main.js` alone has no effect** — run `grunt` and commit the regenerated min file. `assets/js/vendor/` (jQuery fallback, modernizr, html5shiv, respond) is loaded separately and not part of the bundle.
+**Posts are `.html`, not Markdown.** All 24 files in `_posts/` are hand-written HTML with YAML front matter, named `YYYY-MM-DD-slug.html`, permalink `/:year/:month/:day/:title/`. Front matter in use: `title, date, tags` (`layout: post` is applied by a `defaults:` rule, so new posts don't need it). The legacy `comments`, `share` and `type` keys are inert.
+
+**Styles.** `assets/css/main.scss` (front matter makes Jekyll compile it) pulls partials from `_sass/` with `@use`, in cascade order: `tokens` → `base` → `layout` → `archive` → `prose` → `syntax` → `print`. Dart Sass (`sass-embedded`) does the compiling — `@import` is deprecated, so keep using `@use`.
+
+All theming is CSS custom properties defined in `_sass/_tokens.scss`. Light and dark values are declared three times on purpose: `:root`, a `prefers-color-scheme: dark` block, and `:root[data-theme="…"]` blocks so an explicit toggle choice beats the OS preference in both directions. Change a colour in all the relevant blocks or the themes drift apart.
+
+The archive "trace rail" in `_sass/_archive.scss` is the site's signature element. Its geometry is interlocked: `.trace` has `padding-left: var(--rail)`, and `.trace::before` (the rail) sits at `left: calc(var(--rail) - 1px)`, which is **x = -1px in the coordinate space of the child elements**. The year tick and post nodes are positioned against that. Changing `--rail` is safe; changing the offsets is not.
+
+**JavaScript is a single unbundled file.** `assets/js/main.js` is plain ES5, no dependencies, loaded with `defer`, and only handles the theme toggle. There is no build step — edit it and it ships. The pre-paint theme resolution is a separate inline script in `_includes/head.html` and must stay inline and render-blocking to avoid a flash of the wrong theme.
+
+**Icons are inline SVG** via `{% include icon.html name="github" %}` (see `_includes/icon.html` for the set). Font Awesome and its webfonts are gone.

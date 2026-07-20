@@ -1,0 +1,139 @@
+/* Rouge syntax highlighting
+   ==========================================================================
+   Tokens are driven by custom properties so one rule set covers both themes. */
+
+:root {
+  --syn-comment: #7b8493;
+  --syn-keyword: #8b3fc4;
+  --syn-string: #1f7a4d;
+  --syn-number: #b1541c;
+  --syn-name: #2255c4;
+  --syn-const: #a3341f;
+  --syn-error: #c0392b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --syn-comment: #6f7885;
+    --syn-keyword: #cba6f7;
+    --syn-string: #7fd6a2;
+    --syn-number: #f0a36b;
+    --syn-name: #8ab4ff;
+    --syn-const: #f38ba8;
+    --syn-error: #f38ba8;
+  }
+}
+
+:root[data-theme="dark"] {
+  --syn-comment: #6f7885;
+  --syn-keyword: #cba6f7;
+  --syn-string: #7fd6a2;
+  --syn-number: #f0a36b;
+  --syn-name: #8ab4ff;
+  --syn-const: #f38ba8;
+  --syn-error: #f38ba8;
+}
+
+:root[data-theme="light"] {
+  --syn-comment: #7b8493;
+  --syn-keyword: #8b3fc4;
+  --syn-string: #1f7a4d;
+  --syn-number: #b1541c;
+  --syn-name: #2255c4;
+  --syn-const: #a3341f;
+  --syn-error: #c0392b;
+}
+
+.highlight {
+  background: var(--code-bg);
+  border-radius: var(--radius);
+}
+
+.highlight .c,
+.highlight .c1,
+.highlight .cm,
+.highlight .cs,
+.highlight .cd {
+  color: var(--syn-comment);
+  font-style: italic;
+}
+
+.highlight .k,
+.highlight .kc,
+.highlight .kd,
+.highlight .kn,
+.highlight .kp,
+.highlight .kr,
+.highlight .kt,
+.highlight .o,
+.highlight .ow {
+  color: var(--syn-keyword);
+}
+
+.highlight .s,
+.highlight .s1,
+.highlight .s2,
+.highlight .sb,
+.highlight .sc,
+.highlight .sd,
+.highlight .se,
+.highlight .sh,
+.highlight .si,
+.highlight .sx,
+.highlight .sr,
+.highlight .ss {
+  color: var(--syn-string);
+}
+
+.highlight .m,
+.highlight .mf,
+.highlight .mh,
+.highlight .mi,
+.highlight .mo,
+.highlight .il {
+  color: var(--syn-number);
+}
+
+.highlight .nf,
+.highlight .na,
+.highlight .nb,
+.highlight .py {
+  color: var(--syn-name);
+}
+
+.highlight .nc,
+.highlight .nn,
+.highlight .no,
+.highlight .nv,
+.highlight .vi,
+.highlight .vg,
+.highlight .vc {
+  color: var(--syn-const);
+}
+
+.highlight .err {
+  color: var(--syn-error);
+}
+
+.highlight .gd {
+  color: var(--syn-error);
+}
+
+.highlight .gi {
+  color: var(--syn-string);
+}
+
+.highlight .ge {
+  font-style: italic;
+}
+
+.highlight .gs {
+  font-weight: 600;
+}
+
+/* Line numbers, when a post opts into them */
+.highlight .lineno {
+  color: var(--syn-comment);
+  user-select: none;
+  padding-right: 0.9rem;
+}

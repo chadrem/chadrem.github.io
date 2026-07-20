@@ -1,0 +1,47 @@
+/* Print
+   ========================================================================== */
+
+@media print {
+  .masthead,
+  .footer,
+  .postnav,
+  .share,
+  .skip-link,
+  .theme-toggle {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 11pt;
+  }
+
+  .article,
+  .prose {
+    max-width: none;
+  }
+
+  .prose a {
+    color: #000;
+    text-decoration: underline;
+  }
+
+  /* Expose destinations that would otherwise be lost on paper. */
+  .prose a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    word-break: break-all;
+  }
+
+  .prose pre {
+    border: 1px solid #ccc;
+    white-space: pre-wrap;
+  }
+
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+}

@@ -1,60 +1,63 @@
-# Site wide configuration
+# Site-wide configuration
 
 title: Chad Remesch
+tagline: Entrepreneur and software engineer
+description: >-
+  Notes on Ruby concurrency, distributed systems and the gems that come out of
+  building them — by Chad Remesch.
 locale: en_US
-url: http://remesch.com
+lang: en
+url: https://remesch.com
+baseurl: ""
+timezone: America/New_York
 
-
-# Jekyll configuration
+# Build
 
 permalink: /:year/:month/:day/:title/
 markdown: kramdown
 highlighter: rouge
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
 sass:
   sass_dir: _sass
   style: compressed
-gems:
-  - jekyll-sitemap
+
 kramdown:
   auto_ids: true
   footnote_nr: 1
   entity_output: as_char
   toc_levels: 1..6
-  enable_coderay: false
-timezone: America/New_York
+
+feed:
+  path: feed.xml
+
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
 
 # Site owner
+
 owner:
   name: Chad Remesch
   avatar: bio-photo.jpg
-  bio: "Entrepreneur and software engineer"
+  bio: "Entrepreneur and software engineer. I build Ruby concurrency tools."
   email: chad@remesch.com
-  disqus-shortname:
-  twitter: #username
-  facebook: #username
-  google:
-    plus: #username
-    analytics: UA-20861538-1
-    verify:
-    ad-client:
-    ad-slot:
-  bing-verify:
   github: chadrem
-  stackoverflow: #123456/username   from a "http://stackoverflow.com/users/123456/username" link
   linkedin: chadremesch
-  xing: #username
   instagram: chad_remesch
-  lastfm: #username
-  tumblr: #username
-  pinterest: #username
-  foursquare: #username
-  steam: #username
-  dribbble: #username
-  youtube: #username
-  soundcloud: #username
-  weibo: #username
-  flickr: #username
-  codepen: #username
 
-include: [".htaccess"]
-exclude: ["lib", "config.rb", "Capfile", "config", "log", "Rakefile", "Rakefile.rb", "tmp", "less", "*.sublime-project", "*.sublime-workspace", "test", "spec", "Gruntfile.js", "package.json", "node_modules", "Gemfile", "Gemfile.lock", "LICENSE", "README.md"]
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - LICENSE
+  - README.md
+  - CLAUDE.md
+  - vendor
+  - .jekyll-cache

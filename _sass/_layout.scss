@@ -1,0 +1,192 @@
+/* Page shell, masthead, footer
+   ========================================================================== */
+
+.shell {
+  width: min(100% - 2.5rem, var(--shell));
+  margin-inline: auto;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.main {
+  flex: 1;
+  padding-block: clamp(2.5rem, 1.5rem + 4vw, 5rem);
+}
+
+/* Masthead
+   -------------------------------------------------------------------------- */
+
+.masthead {
+  border-bottom: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--paper) 85%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.masthead__inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 4.25rem;
+}
+
+.masthead__brand {
+  font-size: var(--step-0);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-decoration: none;
+  margin-right: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* A steady status dot: the one nod to the instrumentation this site is about. */
+.masthead__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+  flex: none;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.nav__link {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--muted);
+  text-decoration: none;
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--radius);
+  transition: color 0.15s var(--ease), background-color 0.15s var(--ease);
+}
+
+.nav__link:hover {
+  color: var(--ink);
+  background: var(--code-bg);
+}
+
+.nav__link[aria-current="page"] {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  margin-left: 0.25rem;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.theme-toggle:hover {
+  color: var(--ink);
+  border-color: var(--rule-strong);
+}
+
+.theme-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Swap sun/moon glyphs based on the resolved theme. */
+.theme-toggle__moon {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-toggle__sun {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-toggle__moon {
+  display: block;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-toggle__sun {
+    display: none;
+  }
+
+  :root:not([data-theme="light"]) .theme-toggle__moon {
+    display: block;
+  }
+}
+
+@media (max-width: 34rem) {
+  .nav__link {
+    padding: 0.4rem 0.45rem;
+  }
+
+  .masthead__inner {
+    gap: 0.25rem;
+  }
+}
+
+/* Footer
+   -------------------------------------------------------------------------- */
+
+.footer {
+  border-top: 1px solid var(--rule);
+  padding-block: 2.5rem;
+  font-size: var(--step--1);
+  color: var(--muted);
+}
+
+.footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+}
+
+.footer__copy {
+  font-family: var(--font-mono);
+  margin-right: auto;
+}
+
+.social {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.social__link {
+  display: grid;
+  place-items: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: var(--radius);
+  color: var(--muted);
+  transition: color 0.15s var(--ease), background-color 0.15s var(--ease);
+}
+
+.social__link:hover {
+  color: var(--ink);
+  background: var(--code-bg);
+}
+
+.social__link svg {
+  width: 17px;
+  height: 17px;
+  fill: currentColor;
+}

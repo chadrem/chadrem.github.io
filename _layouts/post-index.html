@@ -1,65 +1,45 @@
-<!doctype html>
-<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
-<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
-<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
-<head>
-{% include _head.html %}
-</head>
+---
+layout: default
+---
 
-<body class="post-index">
-
-{% include _browser-upgrade.html %}
-
-{% include _navigation.html %}
-
-{% if page.image.feature %}
-  <div class="image-wrap">
-  <img src=
-    {% if page.image.feature contains 'http' %}
-      "{{ page.image.feature }}"
-    {% else %}
-      "{{ site.url }}/images/{{ page.image.feature }}"
-    {% endif %}
-  alt="{{ page.title }} feature image">
-  {% if page.image.credit %}
-    <span class="image-credit">Photo Credit: <a href="{{ page.image.creditlink }}">{{ page.image.credit }}</a></span>
-  {% endif %}
-  </div><!-- /.image-wrap -->
-{% endif %}
-
-<div id="main" role="main">
-  <div class="article-author-side">
-    {% include _author-bio.html %}
+{%- if page.intro %}
+  <div class="intro">
+    <p class="intro__eyebrow">{{ site.tagline }}</p>
+    <h1 class="intro__title">{{ site.owner.name }}</h1>
+    <p class="intro__lede">{{ page.intro }}</p>
   </div>
-  <div id="index">
-    <h1>{{ page.title }}</h1>
-    {% capture written_year %}'None'{% endcapture %}
-    {% for post in site.posts %}  
-      {% capture year %}{{ post.date | date: '%Y' }}{% endcapture %}
-      {% if year != written_year %}
-        <h3>{{ year }}</h3>
-        {% capture written_year %}{{ year }}{% endcapture %}
-      {% endif %}
-      <article>
-        {% if post.link %}
-          <h2 class="link-post"><a href="{{ site.url }}{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a> <a href="{{ post.link }}" target="_blank" title="{{ post.title }}"><i class="fa fa-link"></i></a></h2>
-        {% else %}
-          <h2><a href="{{ site.url }}{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a></h2>
-          <p>{{ post.excerpt | strip_html | truncate: 160 }}</p>
-        {% endif %}
-      </article>
-    {% endfor %}
-  </div><!-- /#index -->
-</div><!-- /#main -->
+{%- else %}
+  <div class="page-header">
+    <h1 class="page-header__title">{{ page.title }}</h1>
+  </div>
+{%- endif %}
 
-<div class="footer-wrap">
-  <footer>
-    {% include _footer.html %}
-  </footer>
-</div><!-- /.footer-wrap -->
+<div class="section-head">
+  <h2 class="section-head__title">Writing &middot; {{ site.posts | size }} posts</h2>
+  <a class="section-head__link" href="{{ '/feed.xml' | relative_url }}">Subscribe</a>
+</div>
 
-{% include _scripts.html %}
-
-</body>
-</html>
+{%- comment -%}
+  Posts genuinely are a chronological sequence, so the rail carries real
+  information rather than decoration. Years are markers on it; posts are nodes.
+{%- endcomment -%}
+<div class="trace">
+  {%- assign years = site.posts | group_by_exp: "post", "post.date | date: '%Y'" -%}
+  {%- for year in years %}
+    <h2 class="trace__year"><span class="trace__year-label">{{ year.name }}</span></h2>
+    <ul class="trace__list">
+      {%- for post in year.items %}
+        <li class="trace__item">
+          <a class="trace__link" href="{{ post.url | relative_url }}">{{ post.title }}</a>
+          <time class="trace__date" datetime="{{ post.date | date_to_xmlschema }}">
+            {{ post.date | date: "%b %-d" }}
+          </time>
+          {%- assign summary = post.excerpt | strip_html | strip | truncate: 150 %}
+          {%- if summary != "" %}
+            <p class="trace__excerpt">{{ summary }}</p>
+          {%- endif %}
+        </li>
+      {%- endfor %}
+    </ul>
+  {%- endfor %}
+</div>

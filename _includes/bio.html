@@ -1,0 +1,13 @@
+<aside class="bio">
+  <img
+    class="bio__avatar"
+    src="{{ site.owner.avatar | prepend: '/images/' | relative_url }}"
+    alt=""
+    width="52"
+    height="52"
+    loading="lazy">
+  <div>
+    <p class="bio__name">{{ site.owner.name }}</p>
+    <p class="bio__text">{{ site.owner.bio }}</p>
+  </div>
+</aside>

@@ -1,0 +1,94 @@
+/* Design tokens
+   ==========================================================================
+   Cool slate neutrals with a single indigo signal colour. The accent is
+   rationed: links, trace nodes and focus rings only. Everything else is
+   monochrome so the archive rail stays the loudest thing on the page. */
+
+:root {
+  color-scheme: light dark;
+
+  --paper: #fafafb;
+  --surface: #ffffff;
+  --ink: #14161a;
+  --ink-soft: #3a4049;
+  --muted: #5c636e;
+  --rule: #e4e6ea;
+  --rule-strong: #cfd3da;
+  --accent: #4b45d8;
+  --accent-hover: #322cb8;
+  --accent-wash: #eeeefc;
+  --code-bg: #f4f5f7;
+  --selection: #dcdaff;
+
+  --font-display: "Instrument Sans", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  --font-prose: "Source Serif 4", ui-serif, Georgia, Cambria, serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  /* Fluid scale, 320px → 1200px viewport */
+  --step--1: clamp(0.79rem, 0.77rem + 0.09vw, 0.84rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.13rem);
+  --step-1: clamp(1.2rem, 1.13rem + 0.36vw, 1.44rem);
+  --step-2: clamp(1.44rem, 1.31rem + 0.63vw, 1.83rem);
+  --step-3: clamp(1.73rem, 1.52rem + 1.03vw, 2.33rem);
+  --step-4: clamp(2.07rem, 1.75rem + 1.62vw, 2.96rem);
+
+  --measure: 68ch;
+  --shell: 58rem;
+  --rail: 4.5rem;
+
+  --radius: 6px;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0e1014;
+    --surface: #15181e;
+    --ink: #e7e9ec;
+    --ink-soft: #c3c8d0;
+    --muted: #939aa5;
+    --rule: #242931;
+    --rule-strong: #343b45;
+    --accent: #9a94ff;
+    --accent-hover: #b7b2ff;
+    --accent-wash: #1c1f33;
+    --code-bg: #1a1e25;
+    --selection: #2e2b5c;
+  }
+}
+
+/* Explicit choice from the theme toggle wins over the OS preference in both
+   directions, so these repeat rather than relying on the media query. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #0e1014;
+  --surface: #15181e;
+  --ink: #e7e9ec;
+  --ink-soft: #c3c8d0;
+  --muted: #939aa5;
+  --rule: #242931;
+  --rule-strong: #343b45;
+  --accent: #9a94ff;
+  --accent-hover: #b7b2ff;
+  --accent-wash: #1c1f33;
+  --code-bg: #1a1e25;
+  --selection: #2e2b5c;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --paper: #fafafb;
+  --surface: #ffffff;
+  --ink: #14161a;
+  --ink-soft: #3a4049;
+  --muted: #5c636e;
+  --rule: #e4e6ea;
+  --rule-strong: #cfd3da;
+  --accent: #4b45d8;
+  --accent-hover: #322cb8;
+  --accent-wash: #eeeefc;
+  --code-bg: #f4f5f7;
+  --selection: #dcdaff;
+}

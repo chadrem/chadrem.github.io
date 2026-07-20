@@ -1,0 +1,277 @@
+/* Long-form reading
+   ==========================================================================
+   Posts are set in a serif at a constrained measure. The display sans is kept
+   for headings so the two roles stay visibly distinct. */
+
+.article {
+  max-width: var(--measure);
+}
+
+.article__header {
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.article__meta {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--muted);
+  margin-bottom: 0.9rem;
+}
+
+.article__title {
+  font-size: var(--step-3);
+}
+
+.prose {
+  font-family: var(--font-prose);
+  font-size: var(--step-1);
+  line-height: 1.68;
+  color: var(--ink-soft);
+}
+
+.prose > * + * {
+  margin-top: 1.35em;
+}
+
+.prose h2,
+.prose h3,
+.prose h4 {
+  font-family: var(--font-display);
+  color: var(--ink);
+  margin-top: 2.4em;
+  margin-bottom: -0.4em;
+}
+
+.prose h2 {
+  font-size: var(--step-2);
+}
+
+.prose h3 {
+  font-size: var(--step-1);
+}
+
+.prose h4 {
+  font-size: var(--step-0);
+}
+
+.prose strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.prose a {
+  text-decoration: underline;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.35em;
+}
+
+.prose li + li {
+  margin-top: 0.4em;
+}
+
+.prose li::marker {
+  color: var(--muted);
+}
+
+.prose blockquote {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 1.25rem;
+  border-left: 2px solid var(--accent);
+  color: var(--muted);
+  font-style: italic;
+}
+
+.prose code {
+  font-size: 0.86em;
+  background: var(--code-bg);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  color: var(--ink);
+}
+
+.prose pre {
+  font-size: var(--step--1);
+  line-height: 1.55;
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+  color: var(--ink);
+  tab-size: 2;
+}
+
+.prose pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+.prose img {
+  border-radius: var(--radius);
+  margin-inline: auto;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-display);
+  font-size: var(--step--1);
+}
+
+.prose th,
+.prose td {
+  text-align: left;
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.prose th {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Tables and other wide blocks scroll inside themselves rather than pushing
+   the page sideways. */
+.prose .table-scroll {
+  overflow-x: auto;
+}
+
+/* Article footer
+   -------------------------------------------------------------------------- */
+
+.article__footer {
+  margin-top: 3.5rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  font-size: var(--step--1);
+  color: var(--muted);
+}
+
+.article__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-right: auto;
+  list-style: none;
+  padding: 0;
+}
+
+.article__tag {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  color: var(--muted);
+}
+
+.share {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.share__label {
+  font-family: var(--font-mono);
+}
+
+/* Post navigation
+   -------------------------------------------------------------------------- */
+
+.postnav {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1rem;
+  margin-top: 3rem;
+}
+
+.postnav__item {
+  display: block;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+  text-decoration: none;
+  transition: border-color 0.15s var(--ease);
+}
+
+.postnav__item:hover {
+  border-color: var(--accent);
+}
+
+.postnav__dir {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.postnav__title {
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.postnav__item--next {
+  text-align: right;
+}
+
+/* Standalone pages
+   -------------------------------------------------------------------------- */
+
+.page-header {
+  max-width: var(--measure);
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.page-header__title {
+  font-size: var(--step-3);
+}
+
+/* Author card
+   -------------------------------------------------------------------------- */
+
+.bio {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: var(--measure);
+  margin-top: 3rem;
+  padding: 1.25rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.bio__avatar {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  flex: none;
+  object-fit: cover;
+}
+
+.bio__name {
+  font-size: var(--step-0);
+  font-weight: 600;
+}
+
+.bio__text {
+  font-size: var(--step--1);
+  color: var(--muted);
+  margin-top: 0.2rem;
+}

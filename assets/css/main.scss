@@ -2,28 +2,13 @@
 sitemap: false
 ---
 
-/*
- *
- *  Minimal Mistakes
- *
- *  Designer: Michael Rose
- *  Twitter: http://twitter.com/mmistakes
- *
-*/
+// remesch.com — compiled by Jekyll from the partials in _sass/.
+// Order matters: tokens define the custom properties everything else reads.
 
-// Partials
-@import "variables";
-@import "grid";
-@import "mixins";
-@import "normalize";
-@import "site";
-@import "typography";
-@import "pygments";
-@import "coderay";
-@import "elements";
-@import "forms";
-@import "page";
-@import "vendor/font-awesome/font-awesome";
-@import "vendor/magnific-popup/magnific-popup";
-//@import "vendor/google/fonts";
-@import "print";
+@use "tokens";
+@use "base";
+@use "layout";
+@use "archive";
+@use "prose";
+@use "syntax";
+@use "print";

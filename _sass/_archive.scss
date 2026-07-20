@@ -1,0 +1,234 @@
+/* Archive — the trace rail
+   ==========================================================================
+   The signature element. Posts are a genuine chronological sequence, so the
+   rail encodes real information: years are markers on a running trace and each
+   post is a node on it. Nothing else on the site uses this treatment. */
+
+.intro {
+  max-width: 46rem;
+  margin-bottom: clamp(3rem, 2rem + 4vw, 5rem);
+}
+
+.intro__eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  margin-bottom: 1rem;
+}
+
+.intro__title {
+  font-size: var(--step-4);
+  margin-bottom: 1.1rem;
+}
+
+.intro__lede {
+  font-family: var(--font-prose);
+  font-size: var(--step-1);
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.intro__lede a {
+  text-decoration: underline;
+}
+
+/* Rail
+   -------------------------------------------------------------------------- */
+
+.trace {
+  position: relative;
+  padding-left: var(--rail);
+}
+
+/* The running trace itself. Solid from the first year marker, fading out at the
+   tail so it reads as a segment of something continuous rather than a border. */
+.trace::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--rail) - 1px);
+  top: 0.55rem;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    var(--rule-strong),
+    var(--rule-strong) calc(100% - 4rem),
+    transparent
+  );
+}
+
+.trace__year {
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  margin: 3rem 0 1.25rem;
+}
+
+.trace__year:first-child {
+  margin-top: 0;
+}
+
+/* Year marker sits in the gutter, straddling the rail. */
+.trace__year-label {
+  position: absolute;
+  left: calc(var(--rail) * -1);
+  width: calc(var(--rail) - 0.9rem);
+  text-align: right;
+  color: var(--ink);
+}
+
+/* Tick joining the year label to the rail. Must reach x=0, which is where the
+   rail sits in this element's coordinate space. */
+.trace__year::after {
+  content: "";
+  position: absolute;
+  left: -0.9rem;
+  top: 0.62em;
+  width: 0.9rem;
+  height: 1px;
+  background: var(--rule-strong);
+}
+
+.trace__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.trace__item {
+  position: relative;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.trace__item:last-child {
+  border-bottom: 0;
+}
+
+/* Node on the rail. Hollow by default, fills on hover/focus. */
+.trace__item::before {
+  content: "";
+  position: absolute;
+  left: calc(-0.9rem - 3.5px);
+  top: 1.55rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 1px solid var(--rule-strong);
+  transition: background-color 0.18s var(--ease), border-color 0.18s var(--ease),
+    transform 0.18s var(--ease);
+}
+
+.trace__item:hover::before,
+.trace__item:focus-within::before {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.35);
+}
+
+.trace__link {
+  font-size: var(--step-1);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.trace__link:hover {
+  color: var(--accent);
+}
+
+/* Whole row is clickable without nesting interactive elements. */
+.trace__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.trace__date {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--muted);
+  margin-top: 0.3rem;
+}
+
+/* No max-width: titles and excerpts share the rail's content column so the
+   entries read as one aligned block. */
+.trace__excerpt {
+  font-family: var(--font-prose);
+  color: var(--ink-soft);
+  line-height: 1.5;
+  margin-top: 0.45rem;
+}
+
+@media (max-width: 40rem) {
+  :root {
+    --rail: 0px;
+  }
+
+  .trace {
+    padding-left: 1.1rem;
+  }
+
+  .trace::before {
+    left: 0;
+  }
+
+  .trace__year-label {
+    position: static;
+    display: block;
+    width: auto;
+    text-align: left;
+  }
+
+  .trace__year::after {
+    display: none;
+  }
+
+  .trace__item::before {
+    left: -1.1rem;
+    transform: translateX(-3.5px);
+  }
+
+  .trace__item:hover::before,
+  .trace__item:focus-within::before {
+    transform: translateX(-3.5px) scale(1.35);
+  }
+}
+
+/* Section heading shared by the archive and "more posts" blocks */
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.section-head__title {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.section-head__link {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  text-decoration: none;
+}
+
+.section-head__link:hover {
+  text-decoration: underline;
+}
