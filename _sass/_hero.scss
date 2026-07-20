@@ -20,8 +20,9 @@
 
 .hero__plate {
   /* The frame is 3:2. Shown wider than that so the hero doesn't push the
-     archive off the first screen — the empty sky takes the crop. */
-  aspect-ratio: 2 / 1;
+     archive off the first screen — the empty sky takes the crop, which keeps
+     the bird and the horizon while losing only dead space. */
+  aspect-ratio: 2.8 / 1;
   border-radius: var(--radius);
 }
 
