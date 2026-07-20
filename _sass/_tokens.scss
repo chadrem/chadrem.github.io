@@ -60,32 +60,6 @@
   }
 }
 
-/* Explicit choice from the theme toggle wins over the OS preference in both
-   directions, so these repeat rather than relying on the media query. */
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --paper: #0e1014;
-  --surface: #15181e;
-  --ink: #eceef1;
-  --ink-soft: #c3c8d0;
-  --muted: #939aa5;
-  --rule: #242931;
-  --rule-strong: #3a414c;
-  --mark: #eceef1;
-  --code-bg: #1a1e25;
-  --selection: #2b313b;
-}
-
-:root[data-theme="light"] {
-  color-scheme: light;
-  --paper: #fafafb;
-  --surface: #ffffff;
-  --ink: #14161a;
-  --ink-soft: #3a4049;
-  --muted: #5c636e;
-  --rule: #e4e6ea;
-  --rule-strong: #cfd3da;
-  --mark: #14161a;
-  --code-bg: #f4f5f7;
-  --selection: #dee2e7;
-}
+/* The theme follows the OS and nothing else — there is no toggle, so no
+   [data-theme] overrides and no JavaScript. `color-scheme: light dark` on
+   :root also gets form controls and scrollbars to match. */

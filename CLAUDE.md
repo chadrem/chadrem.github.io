@@ -48,11 +48,19 @@ Two consequences worth knowing. Components that aren't running text (nav, cards,
 
 `_sass/_syntax.scss` is monochrome for the same reason, differentiating tokens by weight and slope rather than colour. Only one post currently has a code block, so this is mostly forward provision — it's the one file to revisit if highlighted code ever becomes central.
 
-All theming is CSS custom properties defined in `_sass/_tokens.scss`. Light and dark values are declared three times on purpose: `:root`, a `prefers-color-scheme: dark` block, and `:root[data-theme="…"]` blocks so an explicit toggle choice beats the OS preference in both directions. Change a colour in all the relevant blocks or the themes drift apart.
+All theming is CSS custom properties defined in `_sass/_tokens.scss`, in exactly two blocks: `:root` for light and a `prefers-color-scheme: dark` block for dark. **The theme follows the OS and nothing else** — there is deliberately no toggle, so no `[data-theme]` overrides, no `localStorage`, and no pre-paint script. Don't add a switcher back; it was removed on purpose.
 
 The archive "trace rail" in `_sass/_archive.scss` is the site's signature element. Its geometry is interlocked: `.trace` has `padding-left: var(--rail)`, and `.trace::before` (the rail) sits at `left: calc(var(--rail) - 1px)`, which is **x = -1px in the coordinate space of the child elements**. The year tick and post nodes are positioned against that. Changing `--rail` is safe; changing the offsets is not.
 
-**JavaScript is a single unbundled file.** `assets/js/main.js` is plain ES5, no dependencies, loaded with `defer`, and only handles the theme toggle. There is no build step — edit it and it ships. The pre-paint theme resolution is a separate inline script in `_includes/head.html` and must stay inline and render-blocking to avoid a flash of the wrong theme.
+**The site ships no JavaScript at all.** There is no `assets/js/`, no build step, and no `<script>` beyond the JSON-LD block jekyll-seo-tag emits. The theme toggle was the only script and it's gone. Keep it that way unless something genuinely can't be done in CSS.
+
+**There is no masthead or nav bar.** Navigation is placed by context, which is why it appears in three files:
+
+- `_includes/hero.html` — About/Code sit on the identity row of the home page, so pages are reachable without a bar above the content
+- `_includes/footer.html` — the same links plus Archive, on every page, reachable from the end of a long post
+- `_layouts/default.html` — inner pages get a bare `.homelink` (Chad's name, linking home) as their only top chrome
+
+The `page.home` flag is what keeps the name from appearing twice: the home page has it in the hero, so the return link is suppressed there. Both the hero nav and the footer nav read `_data/navigation.yml`, so adding a page means editing that one file.
 
 **Icons are inline SVG** via `{% include icon.html name="github" %}` (see `_includes/icon.html` for the set). Font Awesome and its webfonts are gone.
 

@@ -2,12 +2,10 @@
    ========================================================================== */
 
 @media print {
-  .masthead,
   .footer,
   .postnav,
-  .share,
-  .skip-link,
-  .theme-toggle {
+  .hero__nav,
+  .skip-link {
     display: none !important;
   }
 

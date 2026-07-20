@@ -26,32 +26,48 @@
   </figure>
 
   <div class="hero__byline">
-    <figure class="hero__portrait">
-      <picture>
-        <source
-          type="image/webp"
-          srcset="{{ '/images/portrait-400.webp' | relative_url }} 400w,
-                  {{ '/images/portrait-600.webp' | relative_url }} 600w"
-          sizes="(max-width: 40rem) 5rem, 6.5rem">
-        <img
-          src="{{ '/images/portrait-400.jpg' | relative_url }}"
-          srcset="{{ '/images/portrait-400.jpg' | relative_url }} 400w,
-                  {{ '/images/portrait-600.jpg' | relative_url }} 600w"
-          sizes="(max-width: 40rem) 5rem, 6.5rem"
-          width="2048"
-          height="2048"
-          alt="Chad Remesch holding a rangefinder camera to his eye."
-          decoding="async">
-      </picture>
-    </figure>
+    {%- comment -%}
+      Portrait and name are one unit that never splits; only the page links
+      wrap to their own line on narrow screens.
+    {%- endcomment -%}
+    <div class="hero__id">
+      <figure class="hero__portrait">
+        <picture>
+          <source
+            type="image/webp"
+            srcset="{{ '/images/portrait-400.webp' | relative_url }} 400w,
+                    {{ '/images/portrait-600.webp' | relative_url }} 600w"
+            sizes="(max-width: 40rem) 5rem, 6.5rem">
+          <img
+            src="{{ '/images/portrait-400.jpg' | relative_url }}"
+            srcset="{{ '/images/portrait-400.jpg' | relative_url }} 400w,
+                    {{ '/images/portrait-600.jpg' | relative_url }} 600w"
+            sizes="(max-width: 40rem) 5rem, 6.5rem"
+            width="2048"
+            height="2048"
+            alt="Chad Remesch holding a rangefinder camera to his eye."
+            decoding="async">
+        </picture>
+      </figure>
 
-    <div class="hero__text">
-      <p class="hero__roles">
-        {%- for role in site.roles -%}
-          <span class="hero__role">{{ role }}{% unless forloop.last %},{% endunless %}</span>
-        {%- endfor -%}
-      </p>
-      <h1 class="hero__name">{{ site.owner.name }}</h1>
+      <div class="hero__text">
+        <p class="hero__roles">
+          {%- for role in site.roles -%}
+            <span class="hero__role">{{ role }}{% unless forloop.last %},{% endunless %}</span>
+          {%- endfor -%}
+        </p>
+        <h1 class="hero__name">{{ site.owner.name }}</h1>
+      </div>
     </div>
+
+    {%- comment -%}
+      Pages sit with the identity rather than in a bar of their own. The footer
+      repeats them, so they're reachable from the far end of a long post too.
+    {%- endcomment -%}
+    <nav class="hero__nav" aria-label="Pages">
+      {%- for link in site.data.navigation %}
+        <a class="hero__navlink" href="{{ link.url | relative_url }}">{{ link.title }}</a>
+      {%- endfor %}
+    </nav>
   </div>
 </header>

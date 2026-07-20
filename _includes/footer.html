@@ -1,6 +1,11 @@
 <footer class="footer">
   <div class="footer__inner shell">
-    <span class="footer__copy">&copy; {{ site.time | date: '%Y' }} {{ site.owner.name }}</span>
+    <nav class="footer__nav" aria-label="Pages">
+      {%- for link in site.data.navigation %}
+        <a class="footer__link" href="{{ link.url | relative_url }}">{{ link.title }}</a>
+      {%- endfor %}
+      <a class="footer__link" href="{{ '/posts/' | relative_url }}">Archive</a>
+    </nav>
 
     <div class="social">
       {%- if site.owner.github %}
@@ -27,5 +32,7 @@
         {% include icon.html name="rss" %}
       </a>
     </div>
+
+    <p class="footer__copy">&copy; {{ site.time | date: '%Y' }} {{ site.owner.name }}</p>
   </div>
 </footer>

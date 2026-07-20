@@ -6,14 +6,19 @@
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
-    {% include masthead.html %}
-
     <main class="main shell" id="main">
+      {%- comment -%}
+        The home page carries Chad's name in the hero, so the return link would
+        be a second copy of it. Inner pages have no hero, so this is the only
+        way back and the only chrome above the content.
+      {%- endcomment -%}
+      {%- unless page.home %}
+        <a class="homelink" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+      {%- endunless %}
+
       {{ content }}
     </main>
 
     {% include footer.html %}
-
-    <script src="{{ '/assets/js/main.js' | relative_url }}" defer></script>
   </body>
 </html>

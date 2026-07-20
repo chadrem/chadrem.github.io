@@ -35,9 +35,43 @@
 
 .hero__byline {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: clamp(0.9rem, 0.5rem + 1.6vw, 1.4rem);
   margin-top: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+}
+
+/* Portrait and name stay on one line at every width; only .hero__nav wraps. */
+.hero__id {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.9rem, 0.5rem + 1.6vw, 1.4rem);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Sits opposite the name on the identity row, so pages are reachable without a
+   bar above the content. */
+.hero__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin-left: auto;
+}
+
+.hero__navlink {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.15s var(--ease);
+}
+
+.hero__navlink:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--rule-strong);
+  text-underline-offset: 0.18em;
 }
 
 .hero__portrait {
@@ -89,5 +123,11 @@
 
   .hero__roles {
     line-height: 1.5;
+  }
+
+  /* Drops to its own full-width line under the name rather than crowding it. */
+  .hero__nav {
+    margin-left: 0;
+    flex-basis: 100%;
   }
 }
