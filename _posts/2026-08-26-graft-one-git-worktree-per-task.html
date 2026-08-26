@@ -1,0 +1,58 @@
+---
+title: Graft - One git worktree per task
+date: 2026-08-26
+tags:
+- ai
+- claude
+- git
+- bash
+---
+<p>
+    <a href="https://github.com/chadrem/graft">Graft</a> gives every task its own
+    <a href="https://git-scm.com/docs/git-worktree">git worktree</a>, with
+    <a href="https://claude.com/claude-code">Claude Code</a> running inside it.
+    It creates the worktree, copies in the gitignored files a fresh checkout doesn't have, starts the session
+    there, and offers to clean up when you exit.
+    Run as many at once as you have attention for, and pick any of them back up later with its conversation
+    history intact.
+    It's a single bash script, licensed under the AGPL.
+</p>
+<p>
+    Claude Code has a worktree flag of its own, and two things pushed me to write my own tool anyway.
+    The first is that it recycles names.
+    Claude Code binds a session to its literal working directory.
+    Transcripts live under a slug of the path, and continuing a conversation means the most recent one in that
+    directory.
+    Reuse a worktree name and two unrelated features pool under one path, so continuing resumes whichever
+    happened to be last.
+    Graft never reuses a name.
+    Every worktree carries a date stamp, and a name counts as taken if a directory, a branch or an old transcript
+    ever used it.
+    The cost of a collision isn't a git error.
+    It's a resumed conversation that belongs to somebody else's feature.
+</p>
+<p>
+    The second is that it starts at the git root.
+    In a monorepo where CLAUDE.md and the skills directory live below the root, none of that is discovered, and
+    your project skills silently vanish.
+    Graft takes a subdirectory setting and starts the session where your configuration actually is.
+    It also seeds the gitignored files that a clean checkout is missing, the credentials key, the environment
+    file, the MCP config.
+    Without them a worktree may not boot, or it boots with no tools at all.
+    MCP servers connect at session startup, so noticing halfway through and copying the file in doesn't help you.
+</p>
+<p>
+    Running several worktrees at once creates its own problem, which is that a few days later you have a screen
+    full of date stamped names and no memory of what any of them were.
+    So graft lists them with a column for what each one is doing, taken from its first unlanded commit, or before
+    anything is committed, from the first prompt you typed in it.
+    Alongside that it shows which ones have a session running right now, how far ahead of the base branch they
+    are, and how many conversations are still resumable.
+</p>
+<p>
+    Graft does not merge, push, or open pull requests.
+    That stays yours.
+    It offers to delete a worktree only when there are no uncommitted changes, no rebase or merge in progress,
+    and nothing on the branch that hasn't landed.
+    Otherwise it keeps the worktree and tells you which of the three stopped it.
+</p>
