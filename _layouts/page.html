@@ -10,4 +10,9 @@ layout: default
   {{ content }}
 </div>
 
-{% include bio.html %}
+{%- comment -%}
+  No bio card here. The masthead already shows the portrait, the name and the
+  roles at the top of the page, and on a page this short the card repeats all
+  three about 500px below them — the same photograph twice. Posts keep it:
+  there, the masthead is a long way up.
+{%- endcomment -%}

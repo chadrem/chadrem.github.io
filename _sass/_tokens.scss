@@ -3,18 +3,16 @@
    No hue anywhere. Chad's photographs are monochrome, so the interface is too:
    state is carried by value, weight and underline rather than colour.
 
-   Every value is a TRUE neutral: R, G and B are equal. An earlier pass used
-   slightly blue-tinted greys and the dark background read as violet — at very
-   low lightness even ~18% saturation is visible, especially on OLED and
-   wide-gamut displays. Keep these strictly grey; if you restyle, match
-   luminance rather than eyeballing, so contrast ratios hold.
+   Every value is a TRUE neutral: R, G and B are equal. Keep them strictly
+   grey; if you restyle, match luminance rather than eyeballing, so contrast
+   ratios hold.
 
    Links are the highest-contrast text on the page (--ink against --ink-soft
    body copy), which is what makes them read as links without a signal colour.
    --mark is the filled state: trace nodes and focus rings. */
 
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
 
   --paper: #fafafa;
   --surface: #ffffff;
@@ -41,30 +39,28 @@
   --step-3: clamp(1.73rem, 1.52rem + 1.03vw, 2.33rem);
   --step-4: clamp(2.07rem, 1.75rem + 1.62vw, 2.96rem);
 
+  /* The wordmark. Its own step because it is uppercase and tracked, which the
+     body scale does not account for. The floor keeps "CHAD REMESCH" on one
+     line at 320px once the tracking is added. */
+  --step-mark: clamp(1.5rem, 1.2rem + 1.5vw, 2.4rem);
+
   --measure: 68ch;
   --shell: 58rem;
   --rail: 4.5rem;
   --rail-gap: 1.75rem;
 
-  --radius: 6px;
+  /* Gallery. */
+  --frame-gap: clamp(0.75rem, 0.5rem + 1.1vw, 1.25rem);
+
+  /* Square corners throughout. Kept as a token so it is one value to change,
+     not a hunt through nine files. */
+  --radius: 0;
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #101010;
-    --surface: #181818;
-    --ink: #eeeeee;
-    --ink-soft: #c8c8c8;
-    --muted: #999999;
-    --rule: #292929;
-    --rule-strong: #404040;
-    --mark: #eeeeee;
-    --code-bg: #1e1e1e;
-    --selection: #313131;
-  }
-}
 
-/* The theme follows the OS and nothing else — there is no toggle, so no
-   [data-theme] overrides and no JavaScript. `color-scheme: light dark` on
-   :root also gets form controls and scrollbars to match. */
+/* The site is light, always. There is no dark palette, no toggle, no
+   [data-theme] overrides, no JavaScript and no prefers-color-scheme query
+   anywhere — this is the only palette. `color-scheme: light` on :root opts the
+   document out of the OS setting, so form controls and scrollbars stay light
+   too rather than being painted dark around a light page. */

@@ -11,5 +11,7 @@ sitemap: false
 @use "hero";
 @use "archive";
 @use "prose";
+// after prose: .page-header--full overrides .page-header at equal specificity
+@use "photos";
 @use "syntax";
 @use "print";

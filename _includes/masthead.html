@@ -1,0 +1,54 @@
+{%- comment -%}
+  The site's identity block, on every page. One grid, four children, no wrapper
+  divs — each breakpoint re-places them with grid-template-areas, and the roles
+  need to escape their column on a phone, which nothing nested two deep can do.
+
+  The name is the page's h1 on the home page and a link home everywhere else,
+  so an inner page keeps exactly one h1 (its own title) and still has a way
+  back.
+{%- endcomment -%}
+<div class="masthead">
+  <figure class="masthead__portrait">
+    <picture>
+      <source
+        type="image/webp"
+        srcset="{{ '/images/portrait-400.webp' | relative_url }} 400w,
+                {{ '/images/portrait-600.webp' | relative_url }} 600w"
+        sizes="(max-width: 40rem) 5rem, 6.5rem">
+      <img
+        src="{{ '/images/portrait-400.jpg' | relative_url }}"
+        srcset="{{ '/images/portrait-400.jpg' | relative_url }} 400w,
+                {{ '/images/portrait-600.jpg' | relative_url }} 600w"
+        sizes="(max-width: 40rem) 5rem, 6.5rem"
+        width="2048"
+        height="2048"
+        alt="Chad Remesch holding a rangefinder camera to his eye."
+        decoding="async">
+    </picture>
+  </figure>
+
+  <p class="masthead__roles">
+    {%- for role in site.roles -%}
+      <span class="masthead__role">{{ role }}{% unless forloop.last %},{% endunless %}</span>
+    {%- endfor -%}
+  </p>
+
+  {%- if page.home %}
+    <h1 class="masthead__name">{{ site.owner.name }}</h1>
+  {%- else %}
+    <a class="masthead__name" href="{{ '/' | relative_url }}">{{ site.owner.name }}</a>
+  {%- endif %}
+
+  {%- comment -%}
+    At heading size. These were once mono at --step--1 — the voice the site uses
+    for dates, counts and tags — so they read as metadata and nobody saw them.
+  {%- endcomment -%}
+  <nav class="masthead__nav" aria-label="Pages">
+    {%- for link in site.data.navigation %}
+      {%- assign current = false -%}
+      {%- if page.url == link.url or page.section.url == link.url %}{% assign current = true %}{% endif -%}
+      <a class="masthead__link" href="{{ link.url | relative_url }}"
+         {%- if current %} aria-current="page"{% endif %}>{{ link.title }}</a>
+    {%- endfor %}
+  </nav>
+</div>

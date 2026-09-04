@@ -8,3 +8,13 @@ vendor/bundle
 *.sublime-project
 *.sublime-workspace
 remesch.iml
+
+node_modules
+assets/js/photos.js
+
+# Generated image derivatives. Photographs live in S3, never in git.
+.photos/
+
+# direnv: holds AWS_PROFILE today, the sort of file that grows secrets.
+.envrc
+.direnv/

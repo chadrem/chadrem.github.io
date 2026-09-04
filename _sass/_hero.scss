@@ -1,24 +1,18 @@
 /* Home hero
    ==========================================================================
-   Two of Chad's own photographs. The shoreline runs as a wide plate; the
-   self-portrait sits beneath it as a byline mark next to his name.
-
-   Both carry the same hairline the trace rail and section rules use, so the
-   photographs read as part of the page rather than dropped into it. */
+   The shoreline plate, home page only. The identity block that sits under it
+   is _includes/masthead.html — shared with every other page — and its styles
+   live in _layout.scss with the rest of the page shell. */
 
 .hero {
   margin-bottom: clamp(3rem, 2rem + 4vw, 4.5rem);
 }
 
-.hero__plate,
-.hero__portrait {
+.hero__plate {
   margin: 0;
   overflow: hidden;
   border: 1px solid var(--rule);
   background: var(--code-bg);
-}
-
-.hero__plate {
   /* The frame is 3:2. Shown wider than that so the hero doesn't push the
      archive off the first screen — the empty sky takes the crop, which keeps
      the bird and the horizon while losing only dead space. */
@@ -33,101 +27,16 @@
   object-position: center 55%;
 }
 
-.hero__byline {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: clamp(0.9rem, 0.5rem + 1.6vw, 1.4rem);
+/* Following the plate rather than opening the page, so it needs the gap above
+   and none below — .hero already carries the space to the archive. */
+.hero .masthead {
   margin-top: clamp(1.25rem, 1rem + 1vw, 1.75rem);
-}
-
-/* Portrait and name stay on one line at every width; only .hero__nav wraps. */
-.hero__id {
-  display: flex;
-  align-items: center;
-  gap: clamp(0.9rem, 0.5rem + 1.6vw, 1.4rem);
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-/* Sits opposite the name on the identity row, so pages are reachable without a
-   bar above the content. */
-.hero__nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem 1.25rem;
-  margin-left: auto;
-}
-
-.hero__navlink {
-  font-family: var(--font-mono);
-  font-size: var(--step--1);
-  color: var(--muted);
-  text-decoration: none;
-  transition: color 0.15s var(--ease);
-}
-
-.hero__navlink:hover {
-  color: var(--ink);
-  text-decoration: underline;
-  text-decoration-color: var(--rule-strong);
-  text-underline-offset: 0.18em;
-}
-
-.hero__portrait {
-  flex: none;
-  width: clamp(5rem, 3.4rem + 6vw, 6.5rem);
-  aspect-ratio: 1;
-  border-radius: var(--radius);
-}
-
-.hero__portrait img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.hero__text {
-  min-width: 0;
-}
-
-/* Flex rather than inline text: Liquid's whitespace control strips the spaces
-   between the spans, so the gap comes from the layout instead. */
-.hero__roles {
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: 1ch;
-  row-gap: 0.15rem;
-  font-family: var(--font-mono);
-  font-size: var(--step--1);
-  color: var(--muted);
-  letter-spacing: 0.02em;
-  margin-bottom: 0.35rem;
-}
-
-/* Wrap between roles, never inside one — "dad of two" stays on one line. */
-.hero__role {
-  white-space: nowrap;
-}
-
-.hero__name {
-  font-size: var(--step-3);
-  letter-spacing: -0.028em;
+  margin-bottom: 0;
 }
 
 @media (max-width: 40rem) {
   .hero__plate {
     /* Narrow viewport has the vertical room, so give the frame back its shape. */
     aspect-ratio: 3 / 2;
-  }
-
-  .hero__roles {
-    line-height: 1.5;
-  }
-
-  /* Drops to its own full-width line under the name rather than crowding it. */
-  .hero__nav {
-    margin-left: 0;
-    flex-basis: 100%;
   }
 }

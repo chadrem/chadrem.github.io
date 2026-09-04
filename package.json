@@ -1,0 +1,16 @@
+{
+  "name": "remesch-gallery",
+  "private": true,
+  "description": "The photography lightbox for remesch.com. Versions are pinned exactly; package-lock.json is the lock.",
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "watch": "node esbuild.config.mjs --watch"
+  },
+  "dependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

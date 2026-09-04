@@ -12,13 +12,27 @@
         be a second copy of it. Inner pages have no hero, so this is the only
         way back and the only chrome above the content.
       {%- endcomment -%}
+      {%- comment -%}
+        The same identity block the home page carries under its photograph, so
+        the top of the site reads the same everywhere. Where a page sits under a
+        section, the section is an eyebrow inside the page header, not a second
+        link up here.
+      {%- endcomment -%}
       {%- unless page.home %}
-        <a class="homelink" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+        {% include masthead.html %}
       {%- endunless %}
 
       {{ content }}
     </main>
 
     {% include footer.html %}
+
+    {%- comment -%}
+      The only JavaScript this site ships, and only on gallery pages. The grid
+      itself is CSS; this upgrades its links into a lightbox.
+    {%- endcomment -%}
+    {%- if page.photo_js %}
+      <script src="{{ '/assets/js/photos.js' | relative_url }}" defer></script>
+    {%- endif %}
   </body>
 </html>

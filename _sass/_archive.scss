@@ -178,26 +178,3 @@
 }
 
 /* Section heading shared by the archive and "more posts" blocks */
-.section-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.75rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--rule);
-}
-
-.section-head__title {
-  font-family: var(--font-mono);
-  font-size: var(--step--1);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.section-head__link {
-  font-family: var(--font-mono);
-  font-size: var(--step--1);
-}

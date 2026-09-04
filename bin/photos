@@ -1,0 +1,351 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Publishes photographs to S3 and records them in _data/photos.json.
+#
+# Photographs never enter git. This script renders derivatives into a local
+# cache that mirrors the bucket layout, syncs the cache to S3, and writes the
+# manifest that Jekyll turns into pages.
+#
+# Stdlib only, on purpose — it shells out to `magick` and `aws`, which are the
+# two tools this repo already assumes. Do not run it under Bundler.
+#
+#   bin/photos add SET SRC...   ingest scans into the cache and the manifest
+#   bin/photos sync             upload anything missing to S3
+#   bin/photos check            reconcile manifest against S3; report gaps
+#   bin/photos prune            delete S3 objects the manifest no longer names
+#   bin/photos fmt              canonical rewrite (also: --base to swap the CDN)
+#   bin/photos ls [SET]         what is in the manifest
+
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "optparse"
+require "set"
+
+ROOT     = File.expand_path("..", __dir__)
+MANIFEST = File.join(ROOT, "_data", "photos.json")
+CACHE    = File.join(ROOT, ".photos", "build")
+BUCKET   = "remesch-photos"
+REGION   = "us-east-2"
+PREFIX   = "p"
+BASE     = "https://#{BUCKET}.s3.#{REGION}.amazonaws.com"
+
+# 300 for contact-sheet cells (~101px on a 58rem shell), 600 for grid columns
+# (~296px), 1200 for the grid at 2x and the lightbox at 1x, 2400 for the
+# lightbox at 2x. Derived from the layout, not picked round.
+WIDTHS  = [300, 600, 1200, 2400].freeze
+FORMATS = %w[webp jpg].freeze
+QUALITY = 84
+
+# Objects are Cache-Control: immutable, so a recipe change has to produce new
+# URLs. `rev` is a hash of this string and sits in the object key: bump the
+# string, re-run sync, and every URL moves. Old objects stay valid until prune.
+#
+# Colour is the photographer's decision, not this script's. Whatever comes in
+# goes out: a frame that is black and white was exported that way, and a colour
+# frame keeps its colour. Nothing here converts. v1 forced -colorspace Gray,
+# which was wrong.
+RECIPE = "asis-lanczos-q#{QUALITY}-icc-chroma-v2"
+REV    = Digest::SHA256.hexdigest(RECIPE)[0, 4]
+
+def die(msg) = abort("photos: #{msg}")
+
+def sh!(*cmd)
+  out, err, st = Open3.capture3(*cmd)
+  die "#{cmd.first} failed\n#{cmd.join(' ')}\n#{err}" unless st.success?
+  out
+end
+
+def slugify(s)
+  s.to_s.downcase.gsub(/[^a-z0-9]+/, "-").gsub(/\A-|-\z/, "")
+end
+
+# ---------------------------------------------------------------------------
+# Manifest
+# ---------------------------------------------------------------------------
+
+def blank_manifest
+  { "v" => 1, "base" => BASE, "widths" => WIDTHS, "formats" => FORMATS,
+    "sets" => [], "photos" => {} }
+end
+
+def load_manifest
+  return blank_manifest unless File.exist?(MANIFEST)
+  JSON.parse(File.read(MANIFEST))
+rescue JSON::ParserError => e
+  die "_data/photos.json is not valid JSON: #{e.message}"
+end
+
+TOP_SET   = %w[slug title description date cover cover_focus photos].freeze
+TOP_PHOTO = %w[rev w h g date alt caption tags].freeze
+
+# JSON.pretty_generate would reshuffle on every run and put each photo across
+# nine lines. This emits a fixed key order, id-sorted photos, and one line per
+# photograph, so adding a frame is a one-line diff.
+def dump(m)
+  m["photos"].each_value { |p| p["tags"] = Array(p["tags"]).uniq.sort if p["tags"] }
+
+  io = +"{\n"
+  io << %(  "v": #{m["v"].to_json},\n)
+  io << %(  "base": #{m["base"].to_json},\n)
+  io << %(  "widths": #{m["widths"].to_json},\n)
+  io << %(  "formats": #{m["formats"].to_json},\n)
+
+  io << %(  "sets": [\n)
+  io << m["sets"].map { |s|
+    body = TOP_SET.filter_map do |k|
+      next if s[k].nil?
+      v = if k == "photos"
+            s[k].empty? ? "[]" : "[\n" + s[k].map { |i| "        #{i.to_json}" }.join(",\n") + "\n      ]"
+          else
+            s[k].to_json
+          end
+      %(      #{k.to_json}: #{v})
+    end
+    "    {\n#{body.join(",\n")}\n    }"
+  }.join(",\n")
+  io << (m["sets"].empty? ? "  ],\n" : "\n  ],\n")
+
+  io << %(  "photos": {\n)
+  io << m["photos"].keys.sort.map { |id|
+    p = m["photos"][id]
+    pairs = TOP_PHOTO.filter_map { |k| "#{k.to_json}: #{p[k].to_json}" unless p[k].nil? }
+    %(    #{id.to_json}: { #{pairs.join(", ")} })
+  }.join(",\n")
+  io << (m["photos"].empty? ? "  }\n}\n" : "\n  }\n}\n")
+
+  die "manifest round-trip mismatch — refusing to write" unless JSON.parse(io) == JSON.parse(JSON.generate(m))
+  io
+end
+
+def write!(m)
+  FileUtils.mkdir_p(File.dirname(MANIFEST))
+  tmp = "#{MANIFEST}.tmp"
+  File.write(tmp, dump(m))
+  File.rename(tmp, MANIFEST)  # atomic: jekyll serve's watcher sees one event
+end
+
+# ---------------------------------------------------------------------------
+# Images
+# ---------------------------------------------------------------------------
+
+# Identity is the source bytes, so re-running add is a no-op and a recipe bump
+# never orphans hand-written alt text.
+def content_id(src) = Digest::SHA256.file(src).hexdigest[0, 12]
+
+# One invocation for size and mean luminance. [0] takes the first frame of a
+# layered scan; -auto-orient applies EXIF rotation so w/h match what a browser
+# paints; mean is read after -colorspace Gray, already in the space a CSS
+# rgb() wants.
+# -colorspace Gray here converts nothing on disk — it is how the mean luminance
+# for the loading placeholder is measured. The derivatives are untouched.
+def probe(src)
+  raw = sh!("magick", "#{src}[0]", "-auto-orient", "-colorspace", "Gray",
+            "-format", "%w %h %[fx:int(255*mean+0.5)]|%[EXIF:DateTimeOriginal]", "info:")
+  nums, shot = raw.split("|", 2)
+  w, h, g = nums.split.map(&:to_i)
+  die "#{File.basename(src)} is #{w}px wide, under the smallest slot (#{WIDTHS.min})" if w < WIDTHS.min
+
+  info = { "w" => w, "h" => h, "g" => g }
+  # The feed is ordered newest first, and a frame's own capture date is the
+  # only thing that orders it correctly across sets. EXIF writes it as
+  # YYYY:MM:DD HH:MM:SS.
+  info["date"] = "#{$1}-#{$2}-#{$3}" if shot.to_s =~ /\A(\d{4}):(\d{2}):(\d{2})/
+  info
+end
+
+def slots(w) = WIDTHS.select { |x| x <= w }
+
+# `NNNx>` is shrink-only, so a slot wider than the source is simply skipped.
+# The client rebuilds the same list with widths.filter(w => w <= photo.w).
+def derive(src, id, natural_w)
+  dir = File.join(CACHE, id, REV)
+  FileUtils.mkdir_p(dir)
+  slots(natural_w).each do |w|
+    # No -colorspace: the source decides whether a frame is colour.
+    #
+    # `+profile "!icc,icm,*"` rather than -strip. -strip drops EXIF, IPTC and
+    # XMP, which is wanted, but it drops the ICC profile too — and a browser
+    # then just assumes sRGB. Harmless for an sRGB source, wrong for an
+    # AdobeRGB or ProPhoto one. So the colour profile stays, everything else
+    # goes.
+    #
+    # -sampling-factor 1x1 keeps full chroma resolution. ImageMagick defaults
+    # to 4:2:0 at this quality, the usual web trade; for a photographer's own
+    # colour work the extra bytes are worth it.
+    base = ["magick", "#{src}[0]", "-auto-orient",
+            "-filter", "Lanczos", "-resize", "#{w}x>",
+            "+profile", "!icc,icm,*", "-sampling-factor", "1x1",
+            "-quality", QUALITY.to_s]
+    jpg  = File.join(dir, "#{w}.jpg")
+    webp = File.join(dir, "#{w}.webp")
+    sh!(*base, jpg)                              unless File.exist?(jpg)
+    sh!(*base, "-define", "webp:method=6", webp) unless File.exist?(webp)
+  end
+end
+
+def expected_keys(m)
+  keys = Set.new
+  m["photos"].each do |id, p|
+    slots(p["w"]).each { |w| FORMATS.each { |f| keys << "#{PREFIX}/#{id}/#{p['rev']}/#{w}.#{f}" } }
+  end
+  keys
+end
+
+def remote_keys
+  out = sh!("aws", "s3api", "list-objects-v2", "--bucket", BUCKET, "--prefix", "#{PREFIX}/",
+            "--query", "Contents[].Key", "--output", "json")
+  Set.new(JSON.parse(out.strip.empty? ? "[]" : out) || [])
+end
+
+# ---------------------------------------------------------------------------
+# Commands
+# ---------------------------------------------------------------------------
+
+def cmd_add(argv)
+  opts = { tags: [] }
+  OptionParser.new do |o|
+    o.banner = "usage: bin/photos add SET SRC... [--title T] [--date YYYY-MM] [--tag t]..."
+    o.on("--title T")      { |v| opts[:title] = v }
+    o.on("--date D")       { |v| opts[:date]  = v }
+    o.on("--tag T")        { |v| opts[:tags] << v }
+    o.on("--description D"){ |v| opts[:desc]  = v }
+  end.parse!(argv)
+
+  set_slug = slugify(argv.shift) or die "need a set slug"
+  srcs = argv
+  die "no source files given" if srcs.empty?
+  srcs.each { |s| die "no such file: #{s}" unless File.file?(s) }
+
+  m = load_manifest
+  set = m["sets"].find { |s| s["slug"] == set_slug }
+  unless set
+    set = { "slug" => set_slug, "title" => opts[:title] || set_slug.split("-").map(&:capitalize).join(" "),
+            "photos" => [] }
+    m["sets"].unshift(set)   # newest set first, matching how code/index.md prepends
+  end
+  set["title"]       = opts[:title] if opts[:title]
+  set["description"] = opts[:desc]  if opts[:desc]
+  set["date"]        = opts[:date]  if opts[:date]
+
+  added = 0
+  srcs.sort.each do |src|
+    id = content_id(src)
+    info = probe(src)
+    derive(src, id, info["w"])
+
+    p = (m["photos"][id] ||= {})
+    known = !p.empty?
+    # merge, never replace: alt / caption / date / tags are hand-written
+    p.merge!("rev" => REV, "w" => info["w"], "h" => info["h"], "g" => info["g"])
+    # ||= so a date written by hand in the manifest always wins over EXIF.
+    p["date"] ||= info["date"] if info["date"]
+    p["alt"]  ||= ""
+    p["tags"]   = ((p["tags"] || []) + opts[:tags]).uniq.sort unless opts[:tags].empty?
+
+    unless set["photos"].include?(id)
+      set["photos"] << id
+      added += 1
+    end
+    puts "  #{known ? 're-derived' : 'added     '} #{id}  #{info['w']}x#{info['h']}  #{File.basename(src)}"
+  end
+
+  set["cover"] ||= set["photos"].first
+  write!(m)
+  puts "#{added} new frame(s) in '#{set_slug}'. Run `bin/photos sync` to upload."
+end
+
+def cmd_sync(argv)
+  dry = argv.include?("--dry-run")
+  die "nothing built — run `bin/photos add` first" unless Dir.exist?(CACHE)
+
+  FORMATS.each do |fmt|
+    ctype = fmt == "jpg" ? "image/jpeg" : "image/webp"
+    cmd = ["aws", "s3", "sync", "#{CACHE}/", "s3://#{BUCKET}/#{PREFIX}/",
+           "--size-only", "--exclude", "*", "--include", "*.#{fmt}",
+           "--content-type", ctype,
+           "--cache-control", "public, max-age=31536000, immutable"]
+    cmd << "--dryrun" if dry
+    print sh!(*cmd)
+  end
+  puts dry ? "(dry run)" : "sync complete."
+end
+
+def cmd_check(_argv)
+  m = load_manifest
+  want = expected_keys(m)
+  have = remote_keys
+  missing = (want - have).to_a.sort
+  orphan  = (have - want).to_a.sort
+
+  in_sets = m["sets"].flat_map { |s| s["photos"] }.to_set
+  unused  = m["photos"].keys.reject { |id| in_sets.include?(id) }
+  noalt   = m["photos"].select { |_, p| p["alt"].to_s.strip.empty? }.keys
+
+  puts "sets      #{m['sets'].size}"
+  puts "photos    #{m['photos'].size}"
+  puts "objects   #{have.size} in S3, #{want.size} expected"
+  puts
+  puts "MISSING FROM S3 (#{missing.size}) — run `bin/photos sync`" unless missing.empty?
+  missing.first(20).each { |k| puts "  #{k}" }
+  puts "ORPHANED IN S3 (#{orphan.size}) — run `bin/photos prune`" unless orphan.empty?
+  orphan.first(20).each { |k| puts "  #{k}" }
+  puts "IN NO SET (#{unused.size}): #{unused.join(' ')}" unless unused.empty?
+  puts "NO ALT TEXT (#{noalt.size}) — edit _data/photos.json:" unless noalt.empty?
+  noalt.each { |id| puts "  #{id}" }
+  puts "all good." if missing.empty? && orphan.empty? && unused.empty? && noalt.empty?
+end
+
+def cmd_prune(argv)
+  m = load_manifest
+  orphan = (remote_keys - expected_keys(m)).to_a.sort
+  return puts("nothing to prune.") if orphan.empty?
+
+  puts orphan
+  unless argv.include?("--yes")
+    print "\ndelete #{orphan.size} object(s) from s3://#{BUCKET}? [y/N] "
+    return puts("aborted.") unless $stdin.gets.to_s.strip.downcase == "y"
+  end
+  orphan.each_slice(1000) do |batch|
+    payload = { "Objects" => batch.map { |k| { "Key" => k } }, "Quiet" => true }
+    sh!("aws", "s3api", "delete-objects", "--bucket", BUCKET, "--delete", JSON.generate(payload))
+  end
+  puts "deleted #{orphan.size}."
+end
+
+def cmd_fmt(argv)
+  base = nil
+  OptionParser.new { |o| o.on("--base URL") { |v| base = v.chomp("/") } }.parse!(argv)
+  m = load_manifest
+  m["base"] = base if base
+  write!(m)
+  puts "rewrote _data/photos.json#{base ? " (base -> #{base})" : ''}"
+end
+
+def cmd_ls(argv)
+  m = load_manifest
+  only = argv.first && slugify(argv.first)
+  m["sets"].each do |s|
+    next if only && s["slug"] != only
+    puts "#{s['slug']}  (#{s['photos'].size} frames)#{s['date'] ? "  #{s['date']}" : ''}"
+    s["photos"].each_with_index do |id, i|
+      p = m["photos"][id] || {}
+      puts format("  %3d  %s  %5dx%-5d  %s", i + 1, id, p["w"].to_i, p["h"].to_i,
+                  p["alt"].to_s.empty? ? "(no alt text)" : p["alt"])
+    end
+  end
+end
+
+case ARGV.shift
+when "add"   then cmd_add(ARGV)
+when "sync"  then cmd_sync(ARGV)
+when "check" then cmd_check(ARGV)
+when "prune" then cmd_prune(ARGV)
+when "fmt"   then cmd_fmt(ARGV)
+when "ls"    then cmd_ls(ARGV)
+else
+  puts File.read(__FILE__).lines[3..21].map { |l| l.sub(/^# ?/, "") }
+  exit 1
+end

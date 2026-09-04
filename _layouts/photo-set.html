@@ -1,0 +1,60 @@
+---
+layout: default
+---
+
+{%- if page.kind == "tag" %}<meta name="robots" content="noindex, follow">{% endif %}
+
+<div class="page-header page-header--full">
+  {%- if page.section %}
+    <nav class="page-header__eyebrow" aria-label="Breadcrumb">
+      <a href="{{ page.section.url | relative_url }}">{{ page.section.title }}</a>
+    </nav>
+  {%- endif %}
+  <h1 class="page-header__title">
+    {%- if page.kind == "tag" %}Tagged &ldquo;{{ page.tag_name }}&rdquo;{% else %}{{ page.title }}{% endif -%}
+  </h1>
+  <p class="pmeta">
+    {{ page.grid | size }} frame{% if page.grid.size != 1 %}s{% endif %}
+    {%- if page.kind == "tag" %} across {{ page.span }} set{% if page.span != 1 %}s{% endif %}
+    {%- elsif page.set_date %} &middot; {{ page.set_date | append: "-01" | date: "%B %Y" }}{% endif %}
+  </p>
+</div>
+
+{%- if page.set_note %}<p class="pnote">{{ page.set_note }}</p>{% endif %}
+
+{%- if page.kind == "set" and page.tags_used.size > 0 %}
+  <ul class="ptags ptags--set">
+    {%- for t in page.tags_used %}
+      <li><a class="ptag" href="{{ '/photography/t/' | append: t | append: '/' | relative_url }}">{{ t }}</a></li>
+    {%- endfor %}
+  </ul>
+{%- endif %}
+
+{%- comment -%}
+  The grid is Liquid and CSS multi-column. It needs no JavaScript, so the LCP
+  image is parser-discovered and the page works with scripting off — each frame
+  links to its full-size file. photos.js upgrades the links into a lightbox.
+{%- endcomment -%}
+<div class="pgrid" id="photogrid">
+  {%- for f in page.grid %}
+    <a class="pframe" href="{{ f.href }}" data-i="{{ forloop.index0 }}"
+       style="--tone:{{ f.tone }};--ar:{{ f.w }}/{{ f.h }}">
+      <picture>
+        <source type="image/webp" srcset="{{ f.webp }}" sizes="{{ f.sizes }}">
+        <img src="{{ f.src }}" srcset="{{ f.jpg }}" sizes="{{ f.sizes }}"
+             width="{{ f.w }}" height="{{ f.h }}" alt="{{ f.alt | escape }}"
+             loading="{% if f.eager %}eager{% else %}lazy{% endif %}"
+             {% if f.first %}fetchpriority="high" {% endif %}decoding="async">
+      </picture>
+    </a>
+  {%- endfor %}
+</div>
+
+<p class="pback"><a href="{{ '/photography/' | relative_url }}">All photographs</a></p>
+
+{%- comment -%}
+  Escape every "<" as \u003c. JSON only ever contains "<" inside a string
+  value, so a blanket replace is safe, and it neutralises "</script" and the
+  "<!--" that would otherwise put the tokenizer into the double-escaped state.
+{%- endcomment -%}
+<script type="application/json" id="photo-data">{{ page.photo_data | jsonify | replace: "<", "\u003c" }}</script>

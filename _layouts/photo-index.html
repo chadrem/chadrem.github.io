@@ -1,0 +1,49 @@
+---
+layout: default
+---
+
+{%- assign ix = site.data.photo_index %}
+
+<div class="page-header page-header--full">
+  <h1 class="page-header__title">{{ page.title }}</h1>
+</div>
+
+{%- if ix and ix.count > 0 %}
+
+  {%- comment -%}
+    One feed, newest first. The opening frames are rendered here so the page
+    works with scripting off and the first photograph is parser-discovered;
+    React then takes the list over and windows it, because the feed is the
+    whole archive and mounting every frame does not scale.
+  {%- endcomment -%}
+  <div id="photofeed">
+    <div class="feed feed--static">
+      {%- for f in ix.opening %}
+        <a class="feed__frame" href="{{ f.href }}">
+          <picture>
+            <source type="image/webp" srcset="{{ f.webp }}" sizes="{{ f.sizes }}">
+            <img src="{{ f.src }}" srcset="{{ f.jpg }}" sizes="{{ f.sizes }}"
+                 width="{{ f.w }}" height="{{ f.h }}" alt="{{ f.alt | escape }}"
+                 style="background: {{ f.tone }}"
+                 loading="{% if f.eager %}eager{% else %}lazy{% endif %}"
+                 {% if forloop.first %}fetchpriority="high" {% endif %}decoding="async">
+          </picture>
+        </a>
+      {%- endfor %}
+    </div>
+  </div>
+
+  <script type="application/json" id="photo-data">{{ ix.payload | jsonify | replace: "<", "<" }}</script>
+
+{%- else %}
+  {%- comment -%}
+    An empty gallery should still send the reader somewhere. This only shows
+    before the first `bin/photos add`.
+  {%- endcomment -%}
+  <p class="pnote">
+    Nothing published here yet.
+    {%- if site.owner.instagram %}
+      The photographs are on <a href="https://www.instagram.com/{{ site.owner.instagram }}">Instagram</a> in the meantime.
+    {%- endif %}
+  </p>
+{%- endif %}

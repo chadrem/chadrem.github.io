@@ -91,7 +91,7 @@
   font-size: 0.86em;
   background: var(--code-bg);
   padding: 0.15em 0.4em;
-  border-radius: 4px;
+  border-radius: var(--radius);
   color: var(--ink);
 }
 
@@ -172,7 +172,7 @@
   font-size: var(--step--1);
   padding: 0.2rem 0.55rem;
   border: 1px solid var(--rule);
-  border-radius: 999px;
+  border-radius: var(--radius);
   color: var(--muted);
 }
 
@@ -238,8 +238,30 @@
   border-bottom: 1px solid var(--rule);
 }
 
+/* A step below the article title. "Photography" and "About" are labels for a
+   page; a post title is the thing itself, so only labels come down. */
 .page-header__title {
-  font-size: var(--step-3);
+  font-size: var(--step-2);
+}
+
+/* Which section the page sits in. Mono caps at --step--1, the same register
+   as the archive's year markers, so the site keeps one voice for structural
+   labels. */
+.page-header__eyebrow {
+  margin-bottom: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.page-header__eyebrow a {
+  color: var(--muted);
+}
+
+.page-header__eyebrow a:hover {
+  color: var(--ink);
 }
 
 /* Author card
@@ -260,7 +282,7 @@
 .bio__avatar {
   width: 3.25rem;
   height: 3.25rem;
-  border-radius: 50%;
+  border-radius: var(--radius);
   flex: none;
   object-fit: cover;
 }

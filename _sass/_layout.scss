@@ -1,7 +1,9 @@
 /* Page shell, return link, footer
    ==========================================================================
-   There is no masthead. Navigation lives with the identity on the home page
-   and in the footer everywhere, so no bar sits above the content. */
+   The masthead is the mark plus the same page links the hero carries, so the
+   top of every page reads the same. Navigation is also repeated in the footer,
+   which is what makes it reachable from the end of a long post.
+*/
 
 .shell {
   width: min(100% - 2.5rem, var(--shell));
@@ -20,24 +22,168 @@ body {
   padding-block: clamp(2.5rem, 1.5rem + 4vw, 4rem);
 }
 
-/* Return link
+/* Masthead
    --------------------------------------------------------------------------
-   Inner pages only. One line of text, no bar, no border, no sticky. */
+   The identity block, on every page. Portrait spanning both rows on the left,
+   roles over name in the middle, pages on the right.
 
-.homelink {
-  display: inline-block;
+     auto      1fr     auto
+   ┌──────────┬───────┬─────┐
+   │          │ roles │     │
+   │ portrait ├───────┤ nav │
+   │          │ name  │     │
+   └──────────┴───────┴─────┘
+
+   A grid rather than nested flex because on a phone the roles have to escape
+   their column and run full width, and nothing nested two deep can be moved
+   out of its parent by CSS alone. */
+
+.masthead {
+  --mast-portrait: clamp(5rem, 3.4rem + 6vw, 6.5rem);
+  --mast-gap: clamp(0.9rem, 0.5rem + 1.6vw, 1.4rem);
+
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "portrait roles nav"
+    "portrait name  nav";
+  align-items: center;
+  column-gap: var(--mast-gap);
+  row-gap: 0.35rem;
   margin-bottom: clamp(2rem, 1.5rem + 2vw, 3rem);
-  font-size: var(--step-0);
-  font-weight: 600;
-  letter-spacing: -0.02em;
+}
+
+.masthead__portrait {
+  grid-area: portrait;
+  margin: 0;
+  width: var(--mast-portrait);
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--code-bg);
+}
+
+.masthead__portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Flex rather than inline text: Liquid's whitespace control strips the spaces
+   between the spans, so the gap comes from the layout instead. */
+.masthead__roles {
+  grid-area: roles;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1ch;
+  row-gap: 0.15rem;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+
+/* Wrap between roles, never inside one — "dad of two" stays on one line. */
+.masthead__role {
+  white-space: nowrap;
+}
+
+/* An h1 on the home page, a link home everywhere else. Both values are
+   explicit because _base.scss gives every h1 600 and -0.022em, and the mark
+   wants 700 and positive tracking. */
+.masthead__name {
+  grid-area: name;
+  font-size: var(--step-mark);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--ink);
+}
+
+a.masthead__name {
   text-decoration: none;
 }
 
-.homelink:hover {
-  text-decoration: underline;
+a.masthead__name:hover {
+  /* text-decoration-line, never the shorthand — the shorthand resets
+     text-decoration-color to currentColor and defeats the quiet underline. */
+  text-decoration-line: underline;
   text-decoration-color: var(--rule-strong);
+  text-underline-offset: 0.22em;
+}
+
+/* A stack, not a row. Vertical is what lets these carry heading weight and
+   still hold the name's line: set horizontally at this size they no longer fit
+   beside the roles and drop to a row of their own, which is the dead zone they
+   were lost in when they were mono and muted. */
+.masthead__nav {
+  grid-area: nav;
+  display: grid;
+  gap: 0.1rem;
+  justify-items: end;
+  text-align: right;
+}
+
+.masthead__link {
+  font-size: var(--step-1);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
   text-underline-offset: 0.18em;
+  transition: text-decoration-color 0.15s var(--ease);
+}
+
+.masthead__link:hover,
+.masthead__link:focus-visible {
+  text-decoration-color: currentColor;
+}
+
+/* Where you are. Value, not colour — the palette has none to spend. */
+.masthead__link[aria-current] {
+  text-decoration-color: var(--rule-strong);
+}
+
+/* The stack only earns its place while it sits beside the name. Once it wraps
+   it is three orphaned words hard against the right edge, so below the width
+   where it still fits it drops into the name's column — the grid does that
+   indenting, so nothing has to guess the portrait's width. Measured, not
+   guessed: it holds the row at 1024px, not at 760px. */
+@media (max-width: 60rem) {
+  .masthead {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "portrait roles"
+      "portrait name"
+      "portrait nav";
+  }
+
+  .masthead__nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 1rem;
+    text-align: left;
+  }
+}
+
+/* Beside the portrait the roles run to three lines of grey monospace — the
+   least important thing in the block taking the most room. Given the full
+   width they take two, and the portrait then stands level with the name and
+   the pages instead of towering over a narrow column. */
+@media (max-width: 40rem) {
+  .masthead {
+    grid-template-areas:
+      "roles    roles"
+      "portrait name"
+      "portrait nav";
+  }
+
+  .masthead__roles {
+    line-height: 1.5;
+  }
 }
 
 /* Footer

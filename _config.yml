@@ -73,3 +73,8 @@ exclude:
   - CLAUDE.md
   - vendor
   - .jekyll-cache
+  - bin
+  - src
+  - node_modules
+  - package.json
+  - package-lock.json

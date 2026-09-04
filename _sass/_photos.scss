@@ -1,0 +1,396 @@
+/* Photography
+   ==========================================================================
+   Two views. The index is a windowed vertical feed of every photograph. The
+   set and tag pages are a plain three-column grid.
+
+   The grid is CSS multi-column, so masonry costs no JavaScript: the largest
+   image is parser-discovered, and the page works with scripting off, where
+   every frame is a link to its full-size file. photos.js only upgrades those
+   links into a lightbox.
+   -------------------------------------------------------------------------- */
+
+/* The page header rule should span the grid, not the 68ch measure. */
+.page-header--full {
+  max-width: none;
+}
+
+.pmeta {
+  margin-top: 0.55rem;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.pnote {
+  max-width: var(--measure);
+  margin-bottom: 1.75rem;
+  font-family: var(--font-prose);
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+/* The feed
+   --------------------------------------------------------------------------
+   The index is one vertical run of photographs, newest first — no folders, no
+   covers. Each frame is bounded by the viewport height as well as by the
+   column width, so a whole photograph always fits: on a short, wide window a
+   landscape frame would otherwise run past the bottom and you would have to
+   scroll to see a single image.
+
+   Registered so JavaScript can read them as real lengths. An unregistered
+   custom property computes to its token stream, so getComputedStyle would hand
+   back the literal "clamp(...)" text and Feed.jsx could not measure with it. */
+@property --feed-gap {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 32px;
+}
+
+@property --feed-inset {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 80px;
+}
+
+.feed {
+  --feed-gap: clamp(2rem, 1.4rem + 3vw, 4rem);
+  /* What is held back from the viewport height, so the next frame always peeks
+     over the fold. That sliver is the affordance that says keep scrolling. */
+  --feed-inset: 5rem;
+
+  position: relative;
+}
+
+/* Rendered by Liquid before the script runs, and what a reader without
+   JavaScript keeps. Ordinary flow; no height is computed for it. */
+.feed--static {
+  display: grid;
+  gap: var(--feed-gap);
+}
+
+/* Rendered by Feed.jsx. Every frame is absolutely placed at a computed offset
+   inside a container of known total height, so only the frames near the
+   viewport exist in the DOM. */
+.feed--live .feed__frame {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+.feed__frame {
+  display: grid;
+  place-items: center;
+  cursor: zoom-in;
+  text-decoration: none;
+}
+
+/* display: contents so the <img> is the grid item — max-height on a descendant
+   of an inline <picture> never binds. */
+.feed__frame picture {
+  display: contents;
+}
+
+/* ...and that promotes <source> to a grid item too, whose empty row would
+   otherwise take half the free space and push the photograph off centre. */
+.feed__frame source {
+  display: none;
+}
+
+.feed__frame img {
+  /* Both zeroes are load-bearing. A grid item's automatic minimum size is its
+     content size, so without them the row cannot shrink below the photograph's
+     natural height, the row overflows the frame, and max-height: 100% then
+     resolves against the overflowing row instead of the frame — the clamp
+     silently does nothing. */
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  border: 1px solid var(--rule);
+  transition: border-color 0.18s var(--ease);
+}
+
+.feed--live .feed__frame img {
+  max-height: 100%;
+}
+
+.feed--static .feed__frame img {
+  max-height: calc(100dvh - var(--feed-inset));
+}
+
+.feed__frame:hover img,
+.feed__frame:focus-visible img {
+  border-color: var(--mark);
+}
+
+/* Tags
+   -------------------------------------------------------------------------- */
+
+.ptags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 2rem;
+  padding: 0;
+  list-style: none;
+}
+
+.ptags--set {
+  margin-top: -0.75rem;
+}
+
+.ptag {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--muted);
+  text-decoration: none;
+  transition:
+    border-color 0.18s var(--ease),
+    color 0.18s var(--ease);
+}
+
+.ptag:hover,
+.ptag:focus-visible {
+  border-color: var(--mark);
+  color: var(--ink);
+}
+
+.ptag__n {
+  margin-left: 0.15em;
+  opacity: 0.65;
+}
+
+/* The grid
+   -------------------------------------------------------------------------- */
+
+.pgrid {
+  columns: 3;
+  column-gap: var(--frame-gap);
+}
+
+.pframe {
+  display: block;
+  break-inside: avoid;
+  margin-bottom: var(--frame-gap);
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  /* --tone is the frame's own mean luminance: a three-byte placeholder that
+     holds the space while the image arrives. */
+  background: var(--tone, var(--code-bg));
+  aspect-ratio: var(--ar);
+  cursor: zoom-in;
+  text-decoration: none;
+  transition: border-color 0.18s var(--ease);
+}
+
+.pframe:hover,
+.pframe:focus-visible {
+  border-color: var(--mark);
+}
+
+.pframe picture,
+.pframe img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.pframe img {
+  object-fit: cover;
+}
+
+.pback {
+  margin-top: 2.5rem;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--muted);
+}
+
+/* Lightbox
+   -------------------------------------------------------------------------- */
+
+.plightbox {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: var(--paper);
+  color: var(--muted);
+}
+
+.plightbox::backdrop {
+  background: var(--paper);
+}
+
+/* Focus lands here on open so no button starts out ringed. Nothing can tab to
+   the dialog itself, so suppressing its own ring costs no keyboard affordance —
+   the buttons still ring when you actually tab to them. */
+.plightbox:focus,
+.plightbox:focus-visible {
+  outline: none;
+}
+
+/* Controls get their own tracks. The photograph lives in the centre cell and
+   nothing is ever drawn over it — the close row and the two nav gutters are
+   reserved whether or not the frame needs them, so nothing shifts between
+   frames either.
+
+     auto  1fr    auto
+   ┌─────┬───────┬─────┐
+   │     │       │  ×  │ auto
+   ├─────┼───────┼─────┤
+   │  ‹  │ photo │  ›  │ 1fr
+   ├─────┴───────┴─────┤
+   │ caption           │ auto
+   └───────────────────┘                                                    */
+.plightbox__inner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+}
+
+.plightbox__close {
+  grid-area: 1 / 3;
+  justify-self: end;
+}
+
+.plightbox__nav--prev {
+  grid-area: 2 / 1;
+  align-self: center;
+}
+
+.plightbox__nav--next {
+  grid-area: 2 / 3;
+  align-self: center;
+}
+
+.plightbox__stage {
+  grid-area: 2 / 2;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(0.75rem, 2vw, 2.25rem);
+}
+
+/* display: contents so the <img> is the grid item. A <picture> is an inline
+   box, and max-height on a descendant of one never binds — the photograph
+   would run off the bottom of the viewport. */
+.plightbox__stage picture {
+  display: contents;
+}
+
+/* ...but display: contents also promotes <source> to a grid item, and an empty
+   auto row then takes half the free space, pushing the photograph below centre.
+   Worst on a short frame in a tall viewport, which is why it showed up first on
+   a phone. A <source> is a resource hint; it has no business in the layout. */
+.plightbox__stage source {
+  display: none;
+}
+
+.plightbox__img {
+  /* Without this a high-key frame dissolves into the surround. Same hairline
+     the grid frames and the hero plate use. */
+  border: 1px solid var(--rule);
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Holds one line whether or not there is a caption, so the stage below it is
+   a constant height and nothing centred in it shifts between frames. */
+.plightbox__bar {
+  grid-area: 3 / 1 / 4 / -1;
+  /* content-box on purpose: the reset makes everything border-box, and under
+     that min-height counts the padding, so an empty bar collapses to padding
+     height and the row is 22px shorter than a captioned one. */
+  box-sizing: content-box;
+  min-height: 1lh;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0.5rem clamp(0.75rem, 2vw, 2.25rem) max(0.9rem, env(safe-area-inset-bottom));
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.04em;
+}
+
+.plightbox__btn {
+  display: grid;
+  place-items: center;
+  /* 56px. Well past the 44px minimum — these sit over a photograph and need
+     to be findable without hunting. */
+  width: 3.5rem;
+  height: 3.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  /* No scrim. The controls have their own tracks and never sit over a
+     photograph, so there is nothing for the glyph to fight. */
+  background: none;
+  color: var(--ink);
+  line-height: 0;
+  cursor: pointer;
+  transition: background-color 0.18s var(--ease);
+}
+
+.plightbox__btn:hover {
+  /* Same hover fill the footer's social links use. */
+  background: var(--code-bg);
+}
+
+.plightbox__btn[disabled] {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* Responsive
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 60rem) {
+  .pgrid {
+    columns: 2;
+  }
+}
+
+@media (max-width: 40rem) {
+  .pgrid {
+    columns: 1;
+  }
+
+  /* Two 56px gutters is a quarter of a phone's width. The photograph takes the
+     whole width instead and the arrows move down beside the caption. */
+  .plightbox__stage {
+    grid-area: 2 / 1 / 3 / -1;
+  }
+
+  .plightbox__nav--prev {
+    grid-area: 3 / 1;
+  }
+
+  .plightbox__nav--next {
+    grid-area: 3 / 3;
+  }
+
+  .plightbox__bar {
+    grid-area: 3 / 2;
+    align-self: center;
+    text-align: center;
+    padding-block: 0;
+  }
+}
