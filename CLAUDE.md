@@ -129,6 +129,8 @@ bin/photos prune            # delete S3 objects the manifest no longer names
 
 Then commit `_data/photos.json` and push. `bin/photos` is stdlib-only Ruby that shells out to `magick` and `aws` — do **not** run it under Bundler and do not give it gems.
 
+The whole run — find what is new, ingest, upload, reconcile, build, commit, deploy, verify live — is captured as a skill in `.claude/skills/publish-photos/`. Use it rather than re-deriving the sequence; "I added more files to upload" is what triggers it.
+
 **Object keys are `p/<id>/<rev>/<width>.<ext>`,** served `Cache-Control: immutable`. `id` is `sha256(source bytes)[0,12]`, so identity survives a re-encode and hand-written alt text is never orphaned. `rev` is `sha256(RECIPE)[0,4]`, so changing the derivative recipe in `bin/photos` moves every URL instead of poisoning caches — bump `RECIPE`, re-`sync`, then `prune`. Widths are 300/600/1200/2400, derived from the layout: 300 for contact-sheet cells (~101px), 600 for grid columns (~296px), 1200/2400 for the lightbox. Slots wider than the source are skipped, and the client rebuilds the same list with `widths.filter(w => w <= photo.w)`.
 
 **Every manifest field must be listed in `bin/photos`'s `TOP_SET` or `TOP_PHOTO`.** Those constants are the canonical key order the deterministic writer emits; a field missing from them would be dropped on the next `fmt`. The writer round-trips its own output and aborts rather than write a lossy manifest, so the failure is loud — but add the key when you add the field.
