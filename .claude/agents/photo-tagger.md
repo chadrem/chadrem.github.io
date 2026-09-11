@@ -39,6 +39,9 @@ A frame's **content id** is the directory two levels above the file:
 - `miscellaneous` — none of the above fits. Still lifes, animals, objects,
   abstracts, strangers photographed as strangers, anything you cannot place.
 
+`favorites` also appears in `_data/photo_tags.yml` but is not a category. It is
+the photographer's own pick, made by hand; never assign it and never remove it.
+
 ## Rules
 
 **More than one tag is allowed and is often right.** Children on a ferris wheel is

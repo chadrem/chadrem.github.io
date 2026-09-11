@@ -238,6 +238,10 @@ work if merged.
 
 ## Changing the vocabulary
 
+One key in the file is not a category: `favorites` is curated by hand, feeds the
+home page's rows, and is never assigned or removed by this skill. `bin/photos`
+lets it sit beside `miscellaneous` and does not count it as a tag for `NO TAGS`.
+
 `_data/photo_tags.yml` is the single source of truth: Jekyll reads it as
 `site.data.photo_tags` for the display labels, and `bin/photos` reads the same file
 for the validation list. Adding a tag means editing that one file.

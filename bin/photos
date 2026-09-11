@@ -100,6 +100,11 @@ end
 # means nobody has looked yet — `check` reports those separately.
 MISC = "miscellaneous"
 
+# Curation, not subject: the photographer's own pick, orthogonal to everything
+# else in the vocabulary. It may sit beside the catch-all, and a frame carrying
+# only it has still not been looked at for a subject tag.
+CURATED = %w[favorites].freeze
+
 # JSON.pretty_generate would reshuffle on every run and put each photo across
 # nine lines. This emits a fixed key order, id-sorted photos, and one line per
 # photograph, so adding a frame is a one-line diff.
@@ -344,8 +349,9 @@ def cmd_tag(argv)
   want.sort.each do |id, tags|
     p      = m["photos"][id]
     before = Array(p["tags"]).uniq.sort
-    after  = (tags || ((before + add) - remove)).uniq.sort
-    die "#{id}: #{MISC} is the no-other-tag tag, not an extra one" if after.include?(MISC) && after.size > 1
+    # --from replaces the subject tags but never touches the curated ones.
+    after  = (tags ? tags + (before & CURATED) : (before + add) - remove).uniq.sort
+    die "#{id}: #{MISC} is the no-other-tag tag, not an extra one" if after.include?(MISC) && (after - CURATED).size > 1
     next if after == before
     # delete, never assign []: dump guards with `if p["tags"]` and an empty array
     # is truthy in Ruby, so "tags": [] would be written and fmt would not undo it.
@@ -385,7 +391,7 @@ def cmd_check(_argv)
   in_sets = m["sets"].flat_map { |s| s["photos"] }.to_set
   unused  = m["photos"].keys.reject { |id| in_sets.include?(id) }
   noalt   = m["photos"].select { |_, p| p["alt"].to_s.strip.empty? }.keys
-  notags  = m["photos"].reject { |_, p| Array(p["tags"]).any? }.keys
+  notags  = m["photos"].reject { |_, p| (Array(p["tags"]) - CURATED).any? }.keys
 
   puts "sets      #{m['sets'].size}"
   puts "photos    #{m['photos'].size}"

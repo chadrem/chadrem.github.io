@@ -1,0 +1,26 @@
+{%- comment -%}
+  The archive rail. Posts genuinely are a chronological sequence, so the rail
+  carries real information rather than decoration: years are markers on it,
+  posts are nodes. Takes `posts` so the home page can hand it the newest three
+  and the blog page the lot.
+{%- endcomment -%}
+<div class="trace">
+  {%- assign years = include.posts | group_by_exp: "post", "post.date | date: '%Y'" -%}
+  {%- for year in years %}
+    <h2 class="trace__year"><span class="trace__year-label">{{ year.name }}</span></h2>
+    <ul class="trace__list">
+      {%- for post in year.items %}
+        <li class="trace__item">
+          <a class="trace__link" href="{{ post.url | relative_url }}">{{ post.title }}</a>
+          <time class="trace__date" datetime="{{ post.date | date_to_xmlschema }}">
+            {{ post.date | date: "%b %-d" }}
+          </time>
+          {%- assign summary = post.excerpt | strip_html | strip | truncate: 150 %}
+          {%- if summary != "" %}
+            <p class="trace__excerpt">{{ summary }}</p>
+          {%- endif %}
+        </li>
+      {%- endfor %}
+    </ul>
+  {%- endfor %}
+</div>

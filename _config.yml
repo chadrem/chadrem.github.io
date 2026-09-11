@@ -54,6 +54,11 @@ defaults:
       type: posts
     values:
       layout: post
+      # So a post marks Blog as the current page in the masthead, the way a
+      # photography set page marks Photography.
+      section:
+        title: Blog
+        url: /blog/
 
 # Site owner
 

@@ -1,0 +1,102 @@
+{%- comment -%}
+  Two rows of favourites, in a different order on every visit.
+
+  The shuffle is the one piece of script the site runs outside /photography/,
+  and it is here because CSS cannot do it: a static build can only ever emit
+  one order. It runs inline and synchronously, right after the container it
+  fills, so the rows exist before first paint and nothing is fetched and then
+  thrown away. With scripting off the <noscript> rows render instead — a fixed
+  selection the plugin packed with the same rule.
+
+  Rows are justified without cropping: each frame's flex-grow is its aspect
+  ratio, so every frame in a row comes out the same height and the row fills
+  the measure exactly. The script only decides membership — which frames go in
+  which row — by adding frames until the row's summed aspect is closest to a
+  target that depends on the viewport: about one landscape frame on a phone,
+  three on a desktop.
+{%- endcomment -%}
+{%- assign fav = site.data.photo_home %}
+{%- if fav and fav.count > 0 %}
+<section class="room">
+  <header class="room__head">
+    <h2 class="room__title">Photography</h2>
+    <p class="room__meta">{{ site.data.photo_index.count }} photographs</p>
+    <a class="room__all" href="{{ '/photography/' | relative_url }}">All photographs</a>
+  </header>
+
+  <div class="favs" id="favs">
+    <noscript>
+      {%- for row in fav.rows %}
+        <div class="favs__row">
+          {%- for f in row %}
+            <a class="favs__frame" href="{{ fav.href | relative_url }}" style="--ar:{{ f.ar }};--tone:{{ f.tone }}">
+              <picture>
+                <source type="image/webp" srcset="{{ f.webp }}" sizes="{{ f.sizes }}">
+                <img src="{{ f.src }}" srcset="{{ f.jpg }}" sizes="{{ f.sizes }}"
+                     width="{{ f.w }}" height="{{ f.h }}" alt="{{ f.alt | escape }}" decoding="async">
+              </picture>
+            </a>
+          {%- endfor %}
+        </div>
+      {%- endfor %}
+    </noscript>
+  </div>
+
+  {%- comment -%}
+    Same escape as the gallery islands: every "<" becomes \u003c, which
+    neutralises "</script" and "<!--" inside string values.
+  {%- endcomment -%}
+  <script type="application/json" id="fav-data">{{ fav.payload | jsonify | replace: "<", "\u003c" }}</script>
+  <script>
+    (function () {
+      var data = JSON.parse(document.getElementById("fav-data").textContent);
+      var box = document.getElementById("favs");
+      var ps = data.photos.slice();
+      for (var i = ps.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = ps[i]; ps[i] = ps[j]; ps[j] = t;
+      }
+
+      // Summed aspect ratio a row aims for. The breakpoints are the site's own,
+      // 40rem and 60rem at 16px.
+      var vw = window.innerWidth;
+      var target = vw < 640 ? 1.8 : vw < 960 ? 3 : 4.3;
+
+      var rows = [], row = [], sum = 0;
+      for (var k = 0; k < ps.length; k++) {
+        var a = ps[k].w / ps[k].h;
+        if (row.length && Math.abs(sum + a - target) > Math.abs(sum - target)) {
+          rows.push(row); row = []; sum = 0;
+          if (rows.length === data.rows) break;
+        }
+        row.push(ps[k]); sum += a;
+      }
+      if (row.length && rows.length < data.rows) rows.push(row);
+
+      function esc(s) {
+        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+      }
+
+      var html = "";
+      rows.forEach(function (r) {
+        var total = 0;
+        r.forEach(function (p) { total += p.w / p.h; });
+        html += '<div class="favs__row">';
+        r.forEach(function (p) {
+          var a = p.w / p.h;
+          // The frame's share of the measure, so srcset picks the right slot.
+          var share = (a / total).toFixed(3);
+          var sizes = "min(calc((100vw - 2.5rem) * " + share + "), calc(58rem * " + share + "))";
+          html += '<a class="favs__frame" href="' + esc(data.href) + '" style="--ar:' + a.toFixed(4) +
+            ';--tone:rgb(' + p.g + ',' + p.g + ',' + p.g + ')">' +
+            '<picture><source type="image/webp" srcset="' + esc(p.webp) + '" sizes="' + sizes + '">' +
+            '<img src="' + esc(p.src) + '" srcset="' + esc(p.jpg) + '" sizes="' + sizes + '"' +
+            ' width="' + p.w + '" height="' + p.h + '" alt="' + esc(p.alt) + '" decoding="async"></picture></a>';
+        });
+        html += "</div>";
+      });
+      box.innerHTML = html;
+    })();
+  </script>
+</section>
+{%- endif %}

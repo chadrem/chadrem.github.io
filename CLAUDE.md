@@ -33,9 +33,10 @@ URLs are emitted with the `relative_url` filter, so `jekyll serve` works directl
 
 ## Architecture
 
-**One base layout.** `_layouts/default.html` holds the entire page shell (head → masthead → `{{ content }}` → footer → JS). The other three set `layout: default` in their own front matter and render only their content:
+**One base layout.** `_layouts/default.html` holds the entire page shell (head → masthead → `{{ content }}` → footer → JS). The others set `layout: default` in their own front matter and render only their content:
 
-- `post-index.html` — all posts grouped by year (`index.md`, `posts/index.md`). Renders the intro block when `page.intro` is set, otherwise a plain page header.
+- `home.html` — the home page (`index.md`): the hero, then two rooms of fixed size, writing and photography. See *The home page* below.
+- `post-index.html` — every post grouped by year (`blog/index.md`), through `_includes/trace.html`, which the home page also uses for its newest three.
 - `post.html` — single post, plus tags and prev/next navigation
 - `page.html` — standalone pages (`about/`, `code/`, `404.md`)
 
@@ -82,7 +83,7 @@ The dialog takes focus itself on open (`tabIndex={-1}` plus an explicit `el.focu
 
 The archive "trace rail" in `_sass/_archive.scss` is the site's signature element. Its geometry is interlocked: `.trace` has `padding-left: var(--rail)`, and `.trace::before` (the rail) sits at `left: calc(var(--rail) - 1px)`, which is **x = -1px in the coordinate space of the child elements**. The year tick and post nodes are positioned against that. Changing `--rail` is safe; changing the offsets is not.
 
-**The site ships no JavaScript outside `/photography/`.** Every other page has no `<script>` beyond the JSON-LD block jekyll-seo-tag emits. The three gallery views load `assets/js/photos.js`, gated on a `photo_js` flag in page data. The theme toggle was the only other script and it's gone; don't bring one back.
+**The site ships no JavaScript outside `/photography/`, with one exception.** Every other page has no `<script>` beyond the JSON-LD block jekyll-seo-tag emits. The three gallery views load `assets/js/photos.js`, gated on a `photo_js` flag in page data. The exception is the favourites shuffle on the home page, inline in `_includes/favorites.html`: the rows are meant to come out in a different order on every visit, and a static build can only ever emit one order, so this is the one thing CSS genuinely cannot do. It runs synchronously, right after the container it fills, so the rows exist before first paint and nothing is fetched and then thrown away; with scripting off the `<noscript>` rows render instead. The theme toggle was the only other script and it's gone; don't bring one back.
 
 The bar for adding script is unchanged: it has to be something CSS genuinely can't do. The photo grid *is* CSS — multi-column, so masonry costs nothing — and only the lightbox needed React. That split is deliberate, so the largest image on a set page is parser-discovered and the page still works with scripting off, where each frame is a plain link to its full-size file.
 
@@ -92,7 +93,11 @@ The bar for adding script is unchanged: it has to be something CSS genuinely can
 - `_includes/footer.html` — the same links plus Archive, on every page, reachable from the end of a long post
 - `_layouts/default.html` — includes it on every page except the home page, where `_includes/hero.html` renders the plate and then includes it
 
-The `page.home` flag is what keeps it from rendering twice on the home page, and what switches the name between an `h1` and a link. Both navs read `_data/navigation.yml`, so adding a page means editing that one file.
+The `page.home` flag is what keeps it from rendering twice on the home page, and what switches the name between an `h1` and a link. Both navs read `_data/navigation.yml`, so adding a page means editing that one file. Blog is one of those links, at `/blog/`; posts carry `section: {url: /blog/}` through the `defaults:` rule in `_config.yml` so a post marks Blog as current the way a set page marks Photography. The archive used to live at `/posts/`, and `posts/index.html` is a meta-refresh stub kept for old links — it has no layout and is out of the sitemap.
+
+**The home page** (`_layouts/home.html`) is the hero and then two rooms, writing then photography, each a section of fixed size with a mirrored header: title, a count in the mono register, a link to the rest. Writing is the newest three posts on the trace rail; photography is two rows of frames tagged `favorites`. Fixed slots on purpose: photographs outnumber posts five to one and arrive in bunches, so anything that arranged the two by date — a merged stream, a two-sided timeline, frames folded under the year markers, all mocked up and rejected — let whichever practice produced more take the page. Each room is filled with its newest or its best whatever the calendar says, and the header carries a count but never a date, because a date there would announce every dry spell. The full archive left the home page; it is at `/blog/`.
+
+The rows are justified without cropping. A frame's `flex-grow` is its aspect ratio (`--ar`) with a zero basis, so every frame in a row gets a width proportional to its aspect, they all land at one height and the row fills the measure exactly; that is CSS. Membership is the script's job: it shuffles, then adds frames to a row while the row's summed aspect gets closer to a target and closes it when the next frame would take it further — 4.3 on a desktop (about three landscape frames), 3 below 60rem, 1.8 below 40rem. `pack` in `_plugins/photo_pages.rb` is the same rule, used to fill the `<noscript>` fallback. Frames link to the favourites tag page rather than to their full-size files, because there is no lightbox on the home page and a raw JPEG from S3 is a worse landing than a grid.
 
 **Icons are inline SVG** via `{% include icon.html name="github" %}` (see `_includes/icon.html` for the set). Font Awesome and its webfonts are gone.
 
@@ -142,6 +147,8 @@ One trap the round-trip cannot catch: `"tags": []`. `dump` guards tag normalisat
 **Tags are a closed vocabulary, and unlike alt text they are generated.** `_data/photo_tags.yml` is the single source of truth for both halves: the key is the URL segment and the value stored in the manifest, the value is the label a reader sees. Jekyll reads it as `site.data.photo_tags` for `_plugins/photo_pages.rb` and `_layouts/photo-set.html`; `bin/photos` reads the same file, via stdlib YAML, for the list it validates against. One list, not two. Keys are authored as slugs because the plugin puts the tag string straight into `/photography/t/<tag>/` with no slugify step anywhere on that path — a typo would mint a page rather than fail.
 
 `miscellaneous` is exclusive: it means "someone looked and nothing else fitted", so it never shares a frame with another tag, and `bin/photos tag` refuses the combination. That is deliberately a different thing from carrying no tags at all, which means nobody has looked yet — `check` reports those as `NO TAGS`. Collapsing the two would make the catch-all page indistinguishable from a to-do list.
+
+`favorites` is the one tag that is curated rather than generated: the photographer's own pick, orthogonal to the subject tags, feeding the home page's two rows. `bin/photos` lists it in `CURATED`, which exempts it from the `miscellaneous` rule (a still life can be a favourite) and from `NO TAGS` (a frame carrying only it has still not been looked at for a subject). The vision pass is told never to assign or remove it. It was seeded with the county fair frames.
 
 Tags are edited through `bin/photos tag`, never by hand: the deterministic writer is the one thing that must have exactly one implementation, and `write!` renames a tmp file into place so `jekyll serve`'s watcher sees a single event. `tag ID... --add/--remove` amends; `tag --from FILE_OR_DIR` takes set semantics, so re-running a file is a no-op and a correction loop is re-runnable. The generating procedure — a Sonnet vision pass over `.photos/build/`, batched twelve frames to a subagent, reviewed in a contact sheet before the merge — is the `tag-photos` skill.
 

@@ -11,6 +11,12 @@
 # `miscellaneous` means "looked at it, fits nothing else" and is exclusive —
 # never combined with another tag. It is not the same as "nobody has looked
 # yet", which is what `bin/photos check`'s NO TAGS report is for.
+#
+# `favorites` is the one curated tag: the photographer's own pick, never
+# assigned by the tag-photos vision pass, and orthogonal to the subject tags —
+# it is the only tag allowed beside `miscellaneous`, and a frame carrying only
+# it still counts as untagged. The home page draws its two rows from it.
+favorites: Favorites
 family: Family
 county-fair: County Fair
 landscape: Landscape

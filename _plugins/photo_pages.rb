@@ -30,6 +30,14 @@ module Photography
   # `sizes` for the grid, matching the two breakpoints in _sass/_photos.scss.
   SIZES = "(max-width: 40rem) 92vw, (max-width: 60rem) 46vw, 296px"
 
+  # The home page's rows come from this tag. Two rows, packed to a summed
+  # aspect of about three landscape frames on a desktop; the inline script in
+  # _includes/favorites.html carries the phone and tablet targets and does the
+  # shuffle, this only packs the fixed <noscript> fallback with the same rule.
+  FAVORITE    = "favorites"
+  HOME_ROWS   = 2
+  HOME_TARGET = 4.3
+
   class Page < Jekyll::PageWithoutAFile
     def initialize(site, dir, attrs)
       super(site, site.source, dir, "index.html")
@@ -99,6 +107,7 @@ module Photography
       end
 
       site.data["photo_index"] = index_data
+      site.data["photo_home"]  = home_data
     end
 
     private
@@ -264,6 +273,55 @@ module Photography
       }
 
       { "payload" => payload, "opening" => opening, "count" => order.size, "tags" => tags }
+    end
+
+    # Frames tagged favorites, newest first: the payload the shuffle reads and a
+    # fixed packing for readers without scripting.
+    def home_data
+      ids = tag_index[FAVORITE] || []
+      photos = ids.each_with_index.filter_map { |id, i|
+        p = @photos[id] or next
+        ws = slots(p)
+        next if ws.empty?
+        { "id" => id, "w" => p["w"], "h" => p["h"], "g" => p["g"], "alt" => alt_for(p, i),
+          "src"  => url(id, p, ws.first, "jpg"),
+          "jpg"  => ws.map { |w| "#{url(id, p, w, 'jpg')} #{w}w" }.join(", "),
+          "webp" => ws.map { |w| "#{url(id, p, w, 'webp')} #{w}w" }.join(", ") }
+      }
+      href = "/#{ROOT}/t/#{FAVORITE}/"
+      rows = pack(photos, HOME_TARGET, HOME_ROWS).map { |row|
+        total = row.sum { |p| p["w"].to_f / p["h"] }
+        row.map { |p|
+          ar    = p["w"].to_f / p["h"]
+          share = (ar / total).round(3)
+          p.merge("ar"    => ar.round(4),
+                  "tone"  => "rgb(#{p['g']},#{p['g']},#{p['g']})",
+                  "sizes" => "min(calc((100vw - 2.5rem) * #{share}), calc(58rem * #{share}))")
+        }
+      }
+      { "count"   => photos.size,
+        "href"    => href,
+        "rows"    => rows,
+        "payload" => { "href" => href, "rows" => HOME_ROWS, "photos" => photos } }
+    end
+
+    # Same rule as the script: keep adding frames while the row's summed aspect
+    # gets closer to the target; close it when the next frame would take it
+    # further away. A row always accepts its first frame.
+    def pack(photos, target, max_rows)
+      rows, row, sum = [], [], 0.0
+      photos.each do |p|
+        a = p["w"].to_f / p["h"]
+        if row.any? && (sum + a - target).abs > (sum - target).abs
+          rows << row
+          row, sum = [], 0.0
+          break if rows.size == max_rows
+        end
+        row << p
+        sum += a
+      end
+      rows << row if row.any? && rows.size < max_rows
+      rows
     end
 
     def og_image(id)

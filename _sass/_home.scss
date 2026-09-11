@@ -1,0 +1,110 @@
+/* Home — the two rooms
+   ==========================================================================
+   Writing then photography, each a section of fixed size with a mirrored
+   header: title, count in the mono register, a link to the rest. The trace
+   rail inside the writing room is _archive.scss unchanged; this file is the
+   headers and the rows of favourites. */
+
+.room + .room {
+  margin-top: clamp(3rem, 2rem + 4vw, 4.5rem);
+}
+
+.room__head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  column-gap: 1.25rem;
+  row-gap: 0.25rem;
+  padding-bottom: 0.9rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.room__title {
+  font-size: var(--step-2);
+}
+
+/* A count and nothing else. A date here would announce every dry spell. */
+.room__meta {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--muted);
+}
+
+.room__all {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Favourites
+   --------------------------------------------------------------------------
+   Justified rows, nothing cropped. A frame's flex-grow is its aspect ratio
+   (--ar, set by the script or the plugin), so with a zero basis every frame in
+   a row gets a width proportional to its aspect and they all land at one
+   height, filling the measure exactly. Membership is the script's job; the
+   geometry is this. */
+
+.favs {
+  display: grid;
+  gap: var(--frame-gap);
+}
+
+.favs__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--frame-gap);
+}
+
+.favs__frame {
+  display: block;
+  flex-grow: var(--ar);
+  flex-shrink: 1;
+  flex-basis: 0;
+  min-width: 0;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  /* Mean luminance of the frame, holding the space while the image arrives. */
+  background: var(--tone, var(--code-bg));
+  text-decoration: none;
+  transition: border-color 0.18s var(--ease);
+}
+
+.favs__frame:hover,
+.favs__frame:focus-visible {
+  border-color: var(--mark);
+}
+
+.favs__frame picture,
+.favs__frame img {
+  display: block;
+  width: 100%;
+}
+
+.favs__frame img {
+  height: auto;
+  aspect-ratio: var(--ar);
+}
+
+/* On a phone the count drops to its own line under the title. Placed
+   explicitly: with auto-placement the spanning count pushes the link to a
+   third row instead of leaving it beside the title. */
+@media (max-width: 40rem) {
+  .room__head {
+    grid-template-columns: 1fr auto;
+  }
+
+  .room__title {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  .room__all {
+    grid-row: 1;
+    grid-column: 2;
+  }
+
+  .room__meta {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+}

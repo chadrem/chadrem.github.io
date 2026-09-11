@@ -10,6 +10,7 @@ sitemap: false
 @use "layout";
 @use "hero";
 @use "archive";
+@use "home";
 @use "prose";
 // after prose: .page-header--full overrides .page-header at equal specificity
 @use "photos";

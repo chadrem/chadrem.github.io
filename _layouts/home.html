@@ -1,0 +1,23 @@
+---
+layout: default
+---
+
+{% include hero.html %}
+
+{%- comment -%}
+  Two rooms of fixed size, writing then photography. Each is filled with its
+  newest or its best regardless of how much of either exists, so the balance
+  between them does not depend on the calendar: hundreds of frames in a year
+  with no posts changes what is shown, not how much room each practice gets.
+{%- endcomment -%}
+<section class="room">
+  <header class="room__head">
+    <h2 class="room__title">Writing</h2>
+    <p class="room__meta">{{ site.posts | size }} posts</p>
+    <a class="room__all" href="{{ '/blog/' | relative_url }}">All posts</a>
+  </header>
+  {%- assign latest = site.posts | slice: 0, 3 %}
+  {% include trace.html posts=latest %}
+</section>
+
+{% include favorites.html %}

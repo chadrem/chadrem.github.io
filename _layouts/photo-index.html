@@ -55,7 +55,7 @@ layout: default
     </div>
   </div>
 
-  <script type="application/json" id="photo-data">{{ ix.payload | jsonify | replace: "<", "<" }}</script>
+  <script type="application/json" id="photo-data">{{ ix.payload | jsonify | replace: "<", "\u003c" }}</script>
 
 {%- else %}
   {%- comment -%}
