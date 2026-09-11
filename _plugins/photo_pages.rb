@@ -216,16 +216,36 @@ module Photography
       seq
     end
 
+    # Only tags actually carried by a frame in the feed, in vocabulary order,
+    # each with its count. A tag with no frames would be a dead control, and
+    # alphabetical order would put the catch-all in the middle of the bar.
+    def feed_tags(order)
+      n = Hash.new(0)
+      order.each { |(_, p, _, _, _)| Array(p["tags"]).each { |t| n[t] += 1 } }
+      n.keys.sort_by { |t| [@labels.keys.index(t) || @labels.size, t] }
+           .map { |t| { "slug" => t, "label" => tag_label(t), "n" => n[t] } }
+    end
+
     def index_data
       order = feed_order
+
+      tags = feed_tags(order)
 
       payload = {
         "view"   => "feed",
         "base"   => @base,
         "widths" => @widths,
+        # The filter bar reads this; so does the Liquid that renders the bar
+        # before the script runs. One computation, both consumers.
+        "tags"   => tags,
         "photos" => order.each_with_index.map { |(id, p, _, _, _), i|
+          t = Array(p["tags"])
           { "id" => id, "rev" => p["rev"], "w" => p["w"], "h" => p["h"], "g" => p["g"],
-            "alt" => alt_for(p, i), "caption" => presence(p["caption"]) }.compact
+            "alt" => alt_for(p, i), "caption" => presence(p["caption"]),
+            # Emitted as slugs rather than indices into the vocabulary: gzip
+            # collapses the repetition anyway, and a readable payload is worth
+            # more than the handful of bytes.
+            "tags" => (t.empty? ? nil : t) }.compact
         },
       }
 
@@ -243,7 +263,7 @@ module Photography
           "eager" => i < 2 }
       }
 
-      { "payload" => payload, "opening" => opening, "count" => order.size }
+      { "payload" => payload, "opening" => opening, "count" => order.size, "tags" => tags }
     end
 
     def og_image(id)

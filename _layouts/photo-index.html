@@ -17,6 +17,28 @@ layout: default
     whole archive and mounting every frame does not scale.
   {%- endcomment -%}
   <div id="photofeed">
+    {%- comment -%}
+      The filter bar, rendered here so a reader without JavaScript gets one too.
+      Without the script each chip is an ordinary link to that tag's own page,
+      which already exists; with it, the script intercepts the click, filters
+      this feed in place and pushes ?tag=<slug>. It sits inside #photofeed
+      because React replaces that element's contents wholesale — rendering it
+      outside would leave two bars on the page.
+    {%- endcomment -%}
+    {%- if ix.tags and ix.tags.size > 1 %}
+      <ul class="ptags ptags--filter">
+        <li>
+          <a class="ptag" href="{{ '/photography/' | relative_url }}" aria-current="true"
+             data-tag="">All<span class="ptag__n">{{ ix.count }}</span></a>
+        </li>
+        {%- for t in ix.tags %}
+          <li>
+            <a class="ptag" href="{{ '/photography/t/' | append: t.slug | append: '/' | relative_url }}"
+               data-tag="{{ t.slug }}">{{ t.label }}<span class="ptag__n">{{ t.n }}</span></a>
+          </li>
+        {%- endfor %}
+      </ul>
+    {%- endif %}
     <div class="feed feed--static">
       {%- for f in ix.opening %}
         <a class="feed__frame" href="{{ f.href }}">
