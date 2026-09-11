@@ -101,6 +101,17 @@ Expect `objects N in S3, N expected` with no MISSING and no ORPHANED section.
   them, which is destructive and irreversible: **ask the user before pruning**,
   and never pass `--yes` unprompted.
 - **NO ALT TEXT** is expected and long-standing — see "Alt text" below.
+- **NO TAGS** lists frames nobody has categorised yet — see Step 5.5.
+
+## Step 5.5 — Tag the new frames
+
+`check` reports `NO TAGS` for every frame carrying none. Run the **tag-photos**
+skill for those ids, then run `check` again and expect the section to be gone.
+
+This sits before the build and the commit because tagging changes the manifest,
+and a frame that ships untagged appears on no tag page. It is a separate skill
+rather than a step here because it also runs standalone, for re-tagging and for
+correcting earlier calls.
 
 ## Step 6 — Build
 
@@ -174,6 +185,18 @@ reports every frame missing it, and the grid falls back to "Photograph, frame N"
 The gap is long-standing and covers the whole manifest, so report it as a
 pre-existing condition rather than as something the new frames introduced, and
 leave it to the user unless they ask for help writing it.
+
+## Tags
+
+Tags **are** generated, which is the opposite of the rule above, and the
+difference is worth being precise about. Alt text is prose written in the
+photographer's voice; a tag is one of five fixed words from
+`_data/photo_tags.yml`, chosen by looking at the frame. A vision pass over the
+local derivative cache proposes them and the photographer confirms every call in
+a contact sheet before anything reaches the manifest — so they are reviewed, not
+invented, and nothing is written that a human has not seen.
+
+The whole procedure is the **tag-photos** skill. Do not improvise it here.
 
 ## Stop and ask, do not guess
 
