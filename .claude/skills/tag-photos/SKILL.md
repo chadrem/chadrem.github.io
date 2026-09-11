@@ -201,6 +201,41 @@ House style: spelled-out counts, no body, no trailers.
 git add _data/photos.json && git commit -m "Tag one hundred and thirty-one frames"
 ```
 
+## The batch files are scratch, and they go stale
+
+`.photos/tags/*.json` exists to carry one vision pass into the manifest. **Once
+merged, `_data/photos.json` is the record and the batch files are not.** They are
+gitignored and no build reads them.
+
+The hazard is that they still look authoritative. `tag --from .photos/tags` takes
+set semantics, so re-running it after a hand edit does not merge with the edit —
+it **reverts** it, silently and without failing a single gate. This has already
+caught two rounds of changes during the first pass.
+
+So after any `bin/photos tag ID... --add/--remove`, do one of two things before
+`.photos/tags` is ever passed to `--from` again:
+
+```bash
+# Re-sync the record from the manifest, which is now the truth.
+ruby -rjson -e '
+photos = JSON.parse(File.read("_data/photos.json"))["photos"]
+Dir.glob(".photos/tags/*.json").each do |f|
+  doc = JSON.parse(File.read(f))
+  doc.each { |id, v| v["tags"] = photos.dig(id, "tags") || [] }
+  File.write(f, JSON.pretty_generate(doc) + "\n")
+end'
+bin/photos tag --from .photos/tags --require-all --dry-run   # expect 0 frames
+```
+
+```bash
+# Or simply throw them away. The next pass writes its own.
+rm -rf .photos/tags
+```
+
+The dry run is the check that matters: **a synced record reports `0 frame(s) would
+change`.** Anything else means the two have drifted and the batch files would undo
+work if merged.
+
 ## Changing the vocabulary
 
 `_data/photo_tags.yml` is the single source of truth: Jekyll reads it as
