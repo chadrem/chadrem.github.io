@@ -25,7 +25,7 @@ layout: default
 {%- if page.kind == "set" and page.tags_used.size > 0 %}
   <ul class="ptags ptags--set">
     {%- for t in page.tags_used %}
-      <li><a class="ptag" href="{{ '/photography/t/' | append: t | append: '/' | relative_url }}">{{ t }}</a></li>
+      <li><a class="ptag" href="{{ '/photography/t/' | append: t.slug | append: '/' | relative_url }}">{{ t.label }}</a></li>
     {%- endfor %}
   </ul>
 {%- endif %}

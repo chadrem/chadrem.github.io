@@ -51,6 +51,10 @@ module Photography
       @base    = @m["base"].to_s.chomp("/")
       @widths  = @m["widths"]
       @photos  = @m["photos"]
+      # Tag slugs are the URL; _data/photo_tags.yml maps them to what a reader
+      # sees. It is the same file bin/photos validates against, so the site and
+      # the publishing script read one list rather than two.
+      @labels  = site.data["photo_tags"] || {}
 
       @m["sets"].each do |s|
         ids = Array(s["photos"])
@@ -64,7 +68,7 @@ module Photography
           "slug"        => s["slug"],
           "set_date"    => s["date"],
           "set_note"    => s["description"],
-          "tags_used"   => ids.flat_map { |i| Array(@photos.dig(i, "tags")) }.uniq.sort,
+          "tags_used"   => tag_pairs(ids.flat_map { |i| Array(@photos.dig(i, "tags")) }.uniq),
           "image"       => og_image(s["cover"] || ids.first),
           "photos"      => true,
           "section"     => { "title" => LABEL, "url" => "/#{ROOT}/" },
@@ -76,10 +80,10 @@ module Photography
       tag_index.each do |tag, ids|
         site.pages << Page.new(site, "#{ROOT}/t/#{tag}",
           "layout"      => "photo-set",
-          "title"       => "Photographs tagged #{tag}",
-          "tag_name"    => tag,
+          "title"       => "Photographs tagged #{tag_label(tag)}",
+          "tag_name"    => tag_label(tag),
           "span"        => @m["sets"].count { |st| (Array(st["photos"]) & ids).any? },
-          "description" => "#{ids.size} photograph#{'s' if ids.size != 1} tagged #{tag}.",
+          "description" => "#{ids.size} photograph#{'s' if ids.size != 1} tagged #{tag_label(tag)}.",
           "kind"        => "tag",
           "slug"        => tag,
           # Tag pages are re-cuts of the set pages. Keep them out of the sitemap
@@ -109,6 +113,18 @@ module Photography
     # most boringly supported unit. The 5rem is --feed-inset in _photos.scss.
     def feed_sizes(p)
     "min(100vw - 2.5rem, 58rem, calc((100vh - 5rem) * #{(p['w'].to_f / p['h']).round(4)}))"
+    end
+
+    # A tag with no entry in _data/photo_tags.yml falls back to its own slug, so
+    # a page still renders rather than blanking its own heading.
+    def tag_label(tag) = @labels[tag] || tag
+
+    # Chips carry both halves: the slug is the href, the label is the text.
+    # Ordered by the vocabulary file rather than alphabetically, so they read in
+    # the order the vocabulary was authored in.
+    def tag_pairs(tags)
+      tags.sort_by { |t| [@labels.keys.index(t) || @labels.size, t] }
+          .map { |t| { "slug" => t, "label" => tag_label(t) } }
     end
 
     def slots(p) = @widths.select { |w| w <= p["w"] }

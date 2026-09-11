@@ -1,0 +1,18 @@
+# The photography tag vocabulary, and the single source of truth for it.
+#
+# The key is the URL segment and the value stored in _data/photos.json; the
+# value is what a reader sees. _plugins/photo_pages.rb puts the key straight
+# into /photography/t/<key>/ with no slugify step anywhere on that path, so a
+# key is authored as a slug and a typo would silently mint a page. bin/photos
+# reads this same file to validate, so there is one list rather than two.
+#
+# Order here is display order.
+#
+# `miscellaneous` means "looked at it, fits nothing else" and is exclusive —
+# never combined with another tag. It is not the same as "nobody has looked
+# yet", which is what `bin/photos check`'s NO TAGS report is for.
+family: Family
+county-fair: County Fair
+landscape: Landscape
+selfie: Selfie
+miscellaneous: Miscellaneous
