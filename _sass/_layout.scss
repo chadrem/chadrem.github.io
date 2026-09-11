@@ -128,6 +128,11 @@ a.masthead__name:hover {
 .masthead__link {
   font-size: var(--step-1);
   font-weight: 600;
+  /* Heading spacing, not body spacing. At the body's 1.6 a stack of four
+     links runs taller than the portrait and the name together, and the nav
+     becomes the block the rest of the masthead sits inside of. At 1.2 it
+     stands level with the portrait, which is where three links used to sit. */
+  line-height: 1.2;
   letter-spacing: -0.02em;
   color: var(--ink);
   text-decoration-line: underline;
