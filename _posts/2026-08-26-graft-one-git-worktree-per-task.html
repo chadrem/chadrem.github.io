@@ -8,51 +8,20 @@ tags:
 - bash
 ---
 <p>
-    <a href="https://github.com/chadrem/graft">Graft</a> gives every task its own
-    <a href="https://git-scm.com/docs/git-worktree">git worktree</a>, with
-    <a href="https://claude.com/claude-code">Claude Code</a> running inside it.
-    It creates the worktree, copies in the gitignored files a fresh checkout doesn't have, starts the session
-    there, and offers to clean up when you exit.
-    Run as many at once as you have attention for, and pick any of them back up later with its conversation
-    history intact.
+    <a href="https://github.com/chadrem/graft">Graft</a> is my take on a better
+    <a href="https://git-scm.com/docs/git-worktree">git worktree</a> integration for
+    <a href="https://claude.com/claude-code">Claude Code</a>.
+    Claude Code's built-in worktree support works well, and it was the inspiration for this, so kudos to the
+    team for building it.
+    Graft adds a few things that solve problems I kept hitting on my own projects, especially monorepos and
+    juggling several projects at once.
+</p>
+<p>
+    Names are never reused, so continuing a conversation can't resume some other task's chat.
+    It can start the session in a subfolder, so a monorepo app's <code>CLAUDE.md</code> and skills are actually
+    found.
+    It copies gitignored files like <code>.env</code> and <code>.mcp.json</code> into every worktree with no setup.
+    <code>graft --list</code> shows what's running, what's unlanded and what each worktree is for; any unique part
+    of a name reopens one; and cleanup is only offered once the work has landed.
     It's a single bash script, licensed under the AGPL.
-</p>
-<p>
-    Claude Code has a worktree flag of its own, and two things pushed me to write my own tool anyway.
-    The first is that it recycles names.
-    Claude Code binds a session to its literal working directory.
-    Transcripts live under a slug of the path, and continuing a conversation means the most recent one in that
-    directory.
-    Reuse a worktree name and two unrelated features pool under one path, so continuing resumes whichever
-    happened to be last.
-    Graft never reuses a name.
-    Every worktree carries a date stamp, and a name counts as taken if a directory, a branch or an old transcript
-    ever used it.
-    The cost of a collision isn't a git error.
-    It's a resumed conversation that belongs to somebody else's feature.
-</p>
-<p>
-    The second is that it starts at the git root.
-    In a monorepo where CLAUDE.md and the skills directory live below the root, none of that is discovered, and
-    your project skills silently vanish.
-    Graft takes a subdirectory setting and starts the session where your configuration actually is.
-    It also seeds the gitignored files that a clean checkout is missing, the credentials key, the environment
-    file, the MCP config.
-    Without them a worktree may not boot, or it boots with no tools at all.
-    MCP servers connect at session startup, so noticing halfway through and copying the file in doesn't help you.
-</p>
-<p>
-    Running several worktrees at once creates its own problem, which is that a few days later you have a screen
-    full of date stamped names and no memory of what any of them were.
-    So graft lists them with a column for what each one is doing, taken from its first unlanded commit, or before
-    anything is committed, from the first prompt you typed in it.
-    Alongside that it shows which ones have a session running right now, how far ahead of the base branch they
-    are, and how many conversations are still resumable.
-</p>
-<p>
-    Graft does not merge, push, or open pull requests.
-    That stays yours.
-    It offers to delete a worktree only when there are no uncommitted changes, no rebase or merge in progress,
-    and nothing on the branch that hasn't landed.
-    Otherwise it keeps the worktree and tells you which of the three stopped it.
 </p>
