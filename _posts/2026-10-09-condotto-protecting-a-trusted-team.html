@@ -1,0 +1,125 @@
+---
+title: Condotto - Protecting a trusted team from itself
+date: 2026-10-09
+tags:
+- ai
+- claude
+- security
+- slack
+---
+<p>
+    <a href="https://github.com/chadrem/condotto">Condotto</a> gives a Slack thread its own Claude Code session,
+    running against your real repository.
+    I <a href="{% post_url 2026-07-20-condotto-team-coding-with-ai-in-slack %}">wrote about it in July</a>.
+    Since then I've been studying LLM and agent security, mostly by thinking about the problem and using
+    Claude Code to pressure test my ideas, poke holes in the code, and learn by doing.
+    It has been great at this.
+    My only wish is that I had access to Mythos, so I could go further and automate breaking into Condotto,
+    the white hat way.
+</p>
+<p>
+    What I came away with is a sharper idea of who Condotto is for, and a set of changes that follow from it.
+</p>
+
+<h2>Who it's for</h2>
+<p>
+    Condotto is for small teams of trusted people.
+    Coders, product managers, and the people responsible for production data access.
+    Startups that move fast usually have a group like this, and they need to connect their Slack to whatever
+    they're building.
+    That can mean anything from read only access to production systems, so a product manager can do their job
+    better, all the way to coders who want a Slack style interface to pair programming.
+</p>
+<p>
+    I use it at <a href="https://www.fromthelobby.com">The Lobby</a> and on my personal projects, and a few
+    friends are looking at it for their companies.
+    One wants it for internal operations tickets.
+    Other teams have to open tickets with his team to get things done, and a read only Condotto can triage
+    them before a human spends time on them.
+</p>
+<p>
+    In every case the assumption is the same: a group of trusted people who want to collaborate.
+    The security work isn't there to make Condotto safe for strangers.
+    It's there so that trust doesn't leak.
+</p>
+
+<h2>Trust leaks through the channel</h2>
+<p>
+    Many organizations use public channels in Slack, and it's very likely someone ends up in a channel they
+    shouldn't have access to.
+    Until recently Condotto heard them anyway.
+    Anyone without a role counted as a member, and whatever they wrote was held and handed to the agent on the
+    next turn.
+    That's a way to steer the agent without being trusted.
+</p>
+<p>
+    Now nobody is heard by default.
+    An architect invites someone into a single thread with <code>@Condotto member @user</code>, and that
+    decision is made from Slack's verified user ID, never by the agent.
+    Messages from anyone else are dropped before their files are downloaded and before their text reaches the
+    agent.
+    Only who spoke and when is written to the audit log.
+    Removing someone takes effect even for messages already waiting in the queue.
+</p>
+
+<h2>Condotto has to protect itself from itself</h2>
+<p>
+    The scariest thing to me isn't an attacker.
+    It's someone on the team accidentally using Condotto to modify itself while trying to get a task done.
+    Claude generally tries to please the people it's working with.
+    That could easily end with Claude realizing it can edit its own database or configuration to give itself
+    extra access, because that's the fastest way to solve the problem in front of it.
+    Prompt injection makes the same thing possible on purpose, from text nobody on the team wrote.
+</p>
+<p>
+    That's what convinced me to add a sandbox.
+    With a <code>[sandbox]</code> section in the config, the agent runs as its own Unix user, with no
+    capabilities and its own clone of the repo.
+    Condotto's SQLite database, its config and the shared repos belong to a different user, so the agent can't
+    read or change them, whatever it's told.
+    Anything the daemon does inside the agent's tree, like dropping in an attachment or picking up a file to
+    post, also runs as the agent, so a planted symlink can't borrow the daemon's privileges.
+</p>
+<p>
+    In July I wrote that I'd cut per-session process isolation because a trusted team doesn't need it.
+    I was thinking about hostile people.
+    I should have been thinking about hostile text, and about a helpful agent.
+</p>
+<p>
+    Without the sandbox, the same hard limits still apply.
+    The agent works in its own worktree, and every path a tool call names is checked against it.
+    Credentials, environment dumps and <code>rm -rf</code> outside the tree are refused for everyone, with
+    no override.
+    The agent only has the tools Condotto knows how to check.
+    Testing those limits is how I found that <code>cp -r ~/.ssh mine</code> would copy keys into the worktree,
+    where reading them was allowed.
+    That hole is closed now.
+</p>
+
+<h2>My favorite feature is a chore going away</h2>
+<p>
+    As silly as it sounds, my favorite new feature is automatic session cleanup.
+    A thread nobody has spoken in gets a warning after a day, and later it's stopped and its worktree deleted.
+    Every step is announced in the thread, including any work that would be lost, so I can keep it alive or let
+    it go.
+    I'm a huge believer that chores need automation, and managing session lifecycles by hand is one I never
+    enjoyed.
+</p>
+<p>
+    Lately I have two to six active threads.
+    Now that they clean up after themselves I expect that to grow to dozens a week.
+    That's a good thing.
+    Lots of sessions with small contexts beat a few sessions with large ones.
+</p>
+
+<h2>What it doesn't do</h2>
+<p>
+    Condotto depends on the people who set it up to limit its access.
+    That's no different from Claude Code or any other coding agent.
+    Give the agent only what it needs.
+    Does it need the internet?
+    Does it need read access to the database, or read and write?
+    Does it need to push to GitHub, or is read only good enough?
+    Condotto is flexible enough to handle all of these, but the person setting it up has to decide correctly.
+    It's the same decision you make about a person's access when they join the team.
+</p>
